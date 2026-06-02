@@ -106,7 +106,6 @@ const gaze = document.getElementById("gaze");
 const status = document.getElementById("status");
 
 let faceLandmarker;
-
 let calibrationData = [];
 
 let weightsX = null;
@@ -134,9 +133,7 @@ let isCalibrate = false
 let mode = "idle"; // idle | calibrating | tracking
 
 async function init(){
-
-    const stream =
-        await navigator.mediaDevices.getUserMedia({
+    const stream = await navigator.mediaDevices.getUserMedia({
             video:true
         });
 
@@ -166,7 +163,6 @@ async function init(){
 }
 
 function irisCenter(landmarks, start){
-
     let x=0;
     let y=0;
 
@@ -181,28 +177,6 @@ function irisCenter(landmarks, start){
     };
 }
 
-function pupilSize(landmarks, start){
-
-  let cx = 0, cy = 0;
-
-  for(let i=0;i<5;i++){
-    cx += landmarks[start+i].x;
-    cy += landmarks[start+i].y;
-  }
-
-  cx /= 5;
-  cy /= 5;
-
-  let dist = 0;
-
-  for(let i=0;i<5;i++){
-    const dx = landmarks[start+i].x - cx;
-    const dy = landmarks[start+i].y - cy;
-    dist += Math.sqrt(dx*dx + dy*dy);
-  }
-
-  return dist / 5;
-}
 
 function getFeatures(result){
 
@@ -214,16 +188,11 @@ function getFeatures(result){
     const left = irisCenter(lm,468);
     const right = irisCenter(lm,473);
 
-    const sizeleft = pupilSize(lm,468);
-    const sizeright = pupilSize(lm,473);
-
     return [
         left.x,
         left.y,
         right.x,
         right.y,
-        sizeleft,
-        sizeright
     ];
 }
 
@@ -264,7 +233,6 @@ async function captureFeature(){
 }
 
 async function runCalibration(){
-
     status.innerText =
       "Calibration en cours...";
 
@@ -296,7 +264,11 @@ async function runCalibration(){
 
     point.style.display="none";
 
+    console.log(calibrationData)
+
     trainModel();
+
+    console.log(weightsX, weightsY)
 
     status.innerText =
       "Calibration terminée";
@@ -323,18 +295,6 @@ function multiply(a,b){
     }
 
     return res;
-}
-
-function inverse2(m){
-
-    const det =
-      m[0][0]*m[1][1]-
-      m[0][1]*m[1][0];
-
-    return [
-      [ m[1][1]/det,-m[0][1]/det],
-      [-m[1][0]/det, m[0][0]/det]
-    ];
 }
 
 function trainModel(){
@@ -417,7 +377,6 @@ function inverseSmall(m){
 }
 
 function predict(features){
-
     if(!weightsX)
         return null;
 
@@ -441,8 +400,7 @@ function loop(){
       performance.now()
     );
 
-  const features =
-    getFeatures(result);
+  const features = getFeatures(result);
 
   if(features && weightsX && mode === "tracking"){
       const pred =
@@ -466,14 +424,16 @@ function loop(){
 
           history.push({
             'time': Date.now(),
-            'leftX': features[0],
-            'leftY': features[1],
-            'rightX': features[2],
-            'rightY': features[3],
-            'pupilLeft': features[4],
-            'pupilRight': features[5],
-            'fixX': smoothedX,
-            'fixY': smoothedY
+            'x_left': features[0],
+            'y_left': features[1],
+            'x_right': features[2],
+            'y_right': features[3],
+            'gaze_x_left': features[0],
+            'gaze_y_left': features[1],
+            'gaze_x_right': features[2],
+            'gaze_y_right': features[3],
+            'fix_x': pred[0],
+            'fix_y': pred[1]
           })
       }
   }
@@ -482,19 +442,17 @@ function loop(){
 }
 
 function exportCSV(){
-
-  let csv = "time,gaze_x_left,gaze_y_left,gaze_x_right,gaze_y_right,pupil_left,pupil_right\n";
+  let csv = "time,gaze_x_left,gaze_y_left,gaze_x_right,gaze_y_right,fix_x,fix_y\n";
 
   for(const h of history){
-
     csv += [
       h.time,
-      h.leftX,
-      h.leftY,
-      h.rightX,
-      h.rightY,
-      h.pupilLeft ?? 0,
-      h.pupilRight ?? 0
+      h.gaze_x_left,
+      h.gaze_y_left,
+      h.gaze_x_right,
+      h.gaze_y_right,
+      h.fix_x,
+      h.fix_y,
     ].join(",") + "\n";
   }
 
@@ -503,7 +461,7 @@ function exportCSV(){
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "eye_tracking.csv";
+  a.download = "v3_eye_tracking.csv";
   a.click();
 
   URL.revokeObjectURL(url);
