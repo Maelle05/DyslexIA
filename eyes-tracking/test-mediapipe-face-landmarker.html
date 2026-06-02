@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eye Tracking Prototype MediaPipe Face Landmarker</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body{
+    margin:0;
+    overflow:hidden;
+    background:#111;
+    color:white;
+    font-family:Arial;
+}
+
+video{
+    position:fixed;
+    right:10px;
+    bottom:10px;
+    width:260px;
+    border-radius:12px;
+    border:2px solid #fff;
+    opacity: 0.5;
+}
+
+#point{
+    position:absolute;
+    width:15px;
+    height:15px;
+    border-radius:50%;
+    background:red;
+    transform:translate(-50%,-50%);
+    display:none;
+}
+
+#gaze{
+    position:absolute;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:lime;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+}
+
+#status{
+    position:fixed;
+    top:10px;
+    left:10px;
+    z-index:1000;
+}
+</style>
+</head>
+<body class="bg-zinc-900 text-white overflow-hidden">
+
+<div id="status" class="fixed top-4 text-sm text-zinc-300">Initialisation...</div>
+
+<div id="point"></div>
+<div id="text" class="flex justify-center w-full h-screen">
+  <div class="w-[70%] h-full flex flex-col justify-center gap-4 text-lg leading-relaxed">
+    <p class="sentence" >J’ai ainsi vécu seul, sans personne avec qui parler véritablement, jusqu’à une panne dans le désert du Sahara, il y a six ans.</p>
+    <p class="sentence" >Quelque chose s’était cassé dans mon moteur.</p>
+    <p class="sentence" >Et comme je n’avais avec moi ni mécanicien, ni passagers, je me préparai à essayer de réussir, tout seul, une réparation difficile.</p>
+    <p class="sentence" >C’était pour moi une question de vie ou de mort.</p>
+    <p class="sentence" >J’avais à peine de l’eau à boire pour huit jours.</p>
+    <p class="sentence" >Le premier soir je me suis donc endormi sur le sable à mille milles de toute terre habitée.</p>
+    <p class="sentence" >J’étais bien plus isolé qu’un naufragé sur un radeau au milieu de l’Océan.</p>
+    <p class="sentence" >Alors vous imaginez ma surprise, au lever du jour, quand une drôle de petite voix m’a réveillé.</p>
+    <span class="text-zinc-400 text-sm" >Extrait de "LE PETIT PRINCE" de Antoine de Saint-Exupéry. Ce contenu est peut-être protégé par des droits d’auteur.</span>
+  </div>
+</div>
+<div id="gaze"></div>
+
+<div class="fixed bottom-4">
+  <button id="btnCalib"
+    class="px-4 py-2 bg-blue-600 rounded hover:bg-blue-500">
+    Démarrer calibration
+  </button>
+
+  <button id="btnTrack"
+    class="px-4 py-2 bg-green-600 rounded hover:bg-green-500">
+    Démarrer tracking
+  </button>
+  <button id="btnExport"
+    class="px-4 py-2 bg-purple-600 rounded hover:bg-purple-500">
+    Export CSV
+  </button>
+</div>
+
+
+<video autoplay playsinline muted></video>
+
+<script type="module">
+
+import {
+  FaceLandmarker,
+  FilesetResolver
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+const now = new Date();
+
+const video = document.querySelector("video");
+const point = document.getElementById("point");
+const gaze = document.getElementById("gaze");
+const status = document.getElementById("status");
+
+let faceLandmarker;
+
+let calibrationData = [];
+
+let weightsX = null;
+let weightsY = null;
+
+let smoothedX = window.innerWidth/2;
+let smoothedY = window.innerHeight/2;
+
+const CALIBRATION_POINTS = [
+    [0.1,0.1],
+    [0.5,0.1],
+    [0.9,0.1],
+
+    [0.1,0.5],
+    [0.5,0.5],
+    [0.9,0.5],
+
+    [0.1,0.9],
+    [0.5,0.9],
+    [0.9,0.9]
+];
+
+let history = []
+let isCalibrate = false
+let mode = "idle"; // idle | calibrating | tracking
+
+async function init(){
+
+    const stream =
+        await navigator.mediaDevices.getUserMedia({
+            video:true
+        });
+
+    video.srcObject = stream;
+
+    await video.play();
+
+    const vision = await FilesetResolver.forVisionTasks(
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+    );
+
+    faceLandmarker =
+      await FaceLandmarker.createFromOptions(
+        vision,
+        {
+          baseOptions:{
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task"
+          },
+          runningMode:"VIDEO",
+          numFaces:1,
+          outputFacialTransformationMatrixes:true
+        }
+      );
+
+    requestAnimationFrame(loop);
+}
+
+function irisCenter(landmarks, start){
+
+    let x=0;
+    let y=0;
+
+    for(let i=0;i<5;i++){
+        x += landmarks[start+i].x;
+        y += landmarks[start+i].y;
+    }
+
+    return {
+        x:x/5,
+        y:y/5
+    };
+}
+
+function pupilSize(landmarks, start){
+
+  let cx = 0, cy = 0;
+
+  for(let i=0;i<5;i++){
+    cx += landmarks[start+i].x;
+    cy += landmarks[start+i].y;
+  }
+
+  cx /= 5;
+  cy /= 5;
+
+  let dist = 0;
+
+  for(let i=0;i<5;i++){
+    const dx = landmarks[start+i].x - cx;
+    const dy = landmarks[start+i].y - cy;
+    dist += Math.sqrt(dx*dx + dy*dy);
+  }
+
+  return dist / 5;
+}
+
+function getFeatures(result){
+
+    if(!result.faceLandmarks.length)
+        return null;
+
+    const lm = result.faceLandmarks[0];
+
+    const left = irisCenter(lm,468);
+    const right = irisCenter(lm,473);
+
+    const sizeleft = pupilSize(lm,468);
+    const sizeright = pupilSize(lm,473);
+
+    return [
+        left.x,
+        left.y,
+        right.x,
+        right.y,
+        sizeleft,
+        sizeright
+    ];
+}
+
+async function captureFeature(){
+
+    return new Promise(resolve=>{
+
+        let samples=[];
+
+        const collect=()=>{
+
+            const res =
+                faceLandmarker.detectForVideo(
+                    video,
+                    performance.now()
+                );
+
+            const f = getFeatures(res);
+
+            if(f)
+                samples.push(f);
+
+            if(samples.length<30){
+                requestAnimationFrame(collect);
+            }else{
+
+                const avg =
+                    samples[0].map((_,i)=>
+                        samples.reduce((s,v)=>s+v[i],0)/samples.length
+                    );
+
+                resolve(avg);
+            }
+        };
+
+        collect();
+    });
+}
+
+async function runCalibration(){
+
+    status.innerText =
+      "Calibration en cours...";
+
+    for(let i=0;i<CALIBRATION_POINTS.length;i++){
+
+        const [rx,ry] =
+            CALIBRATION_POINTS[i];
+
+        const x =
+          window.innerWidth*rx;
+
+        const y =
+          window.innerHeight*ry;
+
+        point.style.display="block";
+        point.style.left=x+"px";
+        point.style.top=y+"px";
+
+        await new Promise(r=>setTimeout(r,1500));
+
+        const features =
+            await captureFeature();
+
+        calibrationData.push({
+            input:features,
+            output:[x,y]
+        });
+    }
+
+    point.style.display="none";
+
+    trainModel();
+
+    status.innerText =
+      "Calibration terminée";
+    isCalibrate = true
+}
+
+function transpose(m){
+    return m[0].map((_,i)=>m.map(r=>r[i]));
+}
+
+function multiply(a,b){
+
+    let res =
+      Array(a.length)
+      .fill()
+      .map(()=>Array(b[0].length).fill(0));
+
+    for(let i=0;i<a.length;i++){
+        for(let j=0;j<b[0].length;j++){
+            for(let k=0;k<b.length;k++){
+                res[i][j]+=a[i][k]*b[k][j];
+            }
+        }
+    }
+
+    return res;
+}
+
+function inverse2(m){
+
+    const det =
+      m[0][0]*m[1][1]-
+      m[0][1]*m[1][0];
+
+    return [
+      [ m[1][1]/det,-m[0][1]/det],
+      [-m[1][0]/det, m[0][0]/det]
+    ];
+}
+
+function trainModel(){
+
+    const X =
+      calibrationData.map(d=>[
+          1,
+          ...d.input
+      ]);
+
+    const Yx =
+      calibrationData.map(d=>[d.output[0]]);
+
+    const Yy =
+      calibrationData.map(d=>[d.output[1]]);
+
+    const Xt = transpose(X);
+
+    const XtX = multiply(Xt,X);
+
+    const pseudo =
+      inverseSmall(XtX);
+
+    weightsX =
+      multiply(
+        multiply(pseudo,Xt),
+        Yx
+      );
+
+    weightsY =
+      multiply(
+        multiply(pseudo,Xt),
+        Yy
+      );
+}
+
+function inverseSmall(m){
+
+    const n = m.length;
+
+    let I = [];
+    let C = [];
+
+    for(let i=0;i<n;i++){
+
+        I[i]=[];
+        C[i]=[];
+
+        for(let j=0;j<n;j++){
+
+            C[i][j]=m[i][j];
+            I[i][j]=i===j?1:0;
+        }
+    }
+
+    for(let i=0;i<n;i++){
+
+        let e=C[i][i];
+
+        for(let j=0;j<n;j++){
+            C[i][j]/=e;
+            I[i][j]/=e;
+        }
+
+        for(let ii=0;ii<n;ii++){
+
+            if(ii===i) continue;
+
+            let f=C[ii][i];
+
+            for(let j=0;j<n;j++){
+
+                C[ii][j]-=f*C[i][j];
+                I[ii][j]-=f*I[i][j];
+            }
+        }
+    }
+
+    return I;
+}
+
+function predict(features){
+
+    if(!weightsX)
+        return null;
+
+    const x=[1,...features];
+
+    let px=0;
+    let py=0;
+
+    for(let i=0;i<x.length;i++){
+
+        px += x[i]*weightsX[i][0];
+        py += x[i]*weightsY[i][0];
+    }
+
+    return [px,py];
+}
+
+function loop(){
+  const result = faceLandmarker.detectForVideo(
+      video,
+      performance.now()
+    );
+
+  const features =
+    getFeatures(result);
+
+  if(features && weightsX && mode === "tracking"){
+      const pred =
+        predict(features);
+
+      if(pred){
+
+          smoothedX =
+            smoothedX*0.8 +
+            pred[0]*0.2;
+
+          smoothedY =
+            smoothedY*0.8 +
+            pred[1]*0.2;
+
+          gaze.style.left =
+            smoothedX+"px";
+
+          gaze.style.top =
+            smoothedY+"px";
+
+          history.push({
+            'time': Date.now(),
+            'leftX': features[0],
+            'leftY': features[1],
+            'rightX': features[2],
+            'rightY': features[3],
+            'pupilLeft': features[4],
+            'pupilRight': features[5],
+            'fixX': smoothedX,
+            'fixY': smoothedY
+          })
+      }
+  }
+
+  requestAnimationFrame(loop);
+}
+
+function exportCSV(){
+
+  let csv = "time,gaze_x_left,gaze_y_left,gaze_x_right,gaze_y_right,pupil_left,pupil_right\n";
+
+  for(const h of history){
+
+    csv += [
+      h.time,
+      h.leftX,
+      h.leftY,
+      h.rightX,
+      h.rightY,
+      h.pupilLeft ?? 0,
+      h.pupilRight ?? 0
+    ].join(",") + "\n";
+  }
+
+  const blob = new Blob([csv], {type:"text/csv"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "eye_tracking.csv";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+init();
+
+// ---------- BUTTONS ----------
+btnCalib.onclick = async ()=>{
+  await runCalibration();
+};
+
+btnTrack.onclick = ()=>{
+  mode = (mode==="tracking") ? "idle" : "tracking";
+  status.innerText = mode;
+
+  if(mode == "tracking"){
+    history = []
+  }
+};
+
+btnExport.onclick = ()=>{
+  exportCSV();
+};
+
+</script>
+</body>
+</html>
