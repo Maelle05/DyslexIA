@@ -165,7 +165,17 @@ def eye_tracking_loop(shared):
                 cur=compute_scale(npts)
                 sl=hc+R@(loff*(cur/lcal)); sr=hc+R@(roff*(cur/rcal))
                 rl2=int(base_r*(cur/lcal)); rr2=int(base_r*(cur/rcal))
-                dl=il-sl; dl/=np.linalg.norm(dl); dr=ir-sr; dr/=np.linalg.norm(dr)
+                dl=il-sl
+                dl/=np.linalg.norm(dl)
+                dr=ir-sr
+                dr/=np.linalg.norm(dr)
+
+                yaw_l, pitch_l = gaze_to_angles(dl)
+                yaw_r, pitch_r = gaze_to_angles(dr)
+
+                lx, ly = apply_map(yaw_l, pitch_l, cxm, cym)
+                rx, ry = apply_map(yaw_r, pitch_r, cxm, cym)
+
                 raw=(dl+dr)/2; raw/=np.linalg.norm(raw)
                 buf.append(raw)
                 avg=np.mean(buf,axis=0); avg/=np.linalg.norm(avg)
@@ -178,7 +188,15 @@ def eye_tracking_loop(shared):
                 cv2.putText(frame,"CALIBRATED",(8,22),cv2.FONT_HERSHEY_SIMPLEX,0.5,(0,255,100),1)
 
                 if recording:
-                    entry={"t":round(time.time(),3),"x":sxy[0],"y":sxy[1]}
+                    entry={
+                        "time":time.time(),
+                        "fix_x":sxy[0],
+                        "fix_y":sxy[1],
+                        "gaze_x_left": lx,
+                        "gaze_y_left": ly,
+                        "gaze_x_right": rx,
+                        "gaze_y_right": ry
+                    }
                     with shared["lock"]:
                         shared["gaze_log"].append(entry)
             elif ll:
@@ -334,7 +352,7 @@ with col_ctrl:
         st.success("✅ Enregistrement terminé")
 
         out = io.StringIO()
-        writer = csv.DictWriter(out, fieldnames=["t", "x", "y"])
+        writer = csv.DictWriter(out, fieldnames=["time", "fix_x", "fix_y", "gaze_x_left", "gaze_y_left", "gaze_x_right", "gaze_y_right"])
         writer.writeheader()
         writer.writerows(S["download_data"])
 
