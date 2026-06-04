@@ -2,7 +2,7 @@ import pandas as pd
 import I2MC
 import numpy as np
 
-def row_to_metrics(raw_df):
+def raw_to_metrics(raw_df):
     df_row = raw_df.copy()
     df_row['time_ms'] = (df_row['time'] - df_row['time'][0]) / 1000
     freq = 1000 / df_row["time_ms"].diff().median()
