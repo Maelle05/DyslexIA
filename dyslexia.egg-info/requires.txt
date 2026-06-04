@@ -5,6 +5,6 @@ scikit-learn
 xgboost
 streamlit
 opencv-python
-mediapipe==0.10.21
+mediapipe
 scipy
 pyautogui
