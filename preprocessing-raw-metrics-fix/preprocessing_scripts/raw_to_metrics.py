@@ -6,12 +6,14 @@ def raw_to_metrics(raw_df):
     df_row = raw_df.copy()
     df_row['time_ms'] = (df_row['time'] - df_row['time'][0]) / 1000
     freq = 1000 / df_row["time_ms"].diff().median()
-    # print(f"FREQ : {freq:.1f} Hz")
+    print(f"FREQ : {freq:.1f} Hz")
+    # FREQ_HZ      = 60
     FREQ_HZ      = freq
 
     min_fix_ms = max(40, 2 * (1000 / FREQ_HZ))
-    # print(f"MIN_FIX_MS : {min_fix_ms}ms")
-    MIN_FIX_MS   = min_fix_ms
+    print(f"MIN_FIX_MS : {min_fix_ms}ms")
+    # MIN_FIX_MS   = 40
+    MIN_FIX_MS = min_fix_ms
 
     SCREEN_X     = 1920
     SCREEN_Y     = 1080
@@ -22,11 +24,11 @@ def raw_to_metrics(raw_df):
     MAX_MERGE_TIME = 30
 
     gaze = pd.DataFrame({
-        'time': df_row['time_ms'],
-        'L_X' : df_row['gaze_x_left'],
-        'L_Y' : df_row['gaze_y_left'],
-        'R_X' : df_row['gaze_x_right'],
-        'R_Y' : df_row['gaze_y_right'],
+        'time': df_row['time_ms'].astype(float),
+        'L_X' : df_row['gaze_x_left'].astype(float),
+        'L_Y' : df_row['gaze_y_left'].astype(float),
+        'R_X' : df_row['gaze_x_right'].astype(float),
+        'R_Y' : df_row['gaze_y_right'].astype(float),
     })
     options = {
         'xres'        : SCREEN_X,
