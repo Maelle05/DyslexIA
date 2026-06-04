@@ -11,15 +11,14 @@ def main():
     X_train = scaler.fit_transform(X_train)
     X_test  = scaler.transform(X_test)
 
+    try:
+        model = XGBoostModel.from_file("xgboost_dyslexia_model_v1.json")
+    except:
+        model = XGBoostModel(X_train, y_train)
+        train_acc, test_acc = model.evaluate(X_train, y_train, X_test, y_test)
+        print(f"Train Accuracy: {train_acc:.4f}")
+        print(f"Test Accuracy: {test_acc:.4f}")
 
-    """model = XGBoostModel(X_train, y_train)
-    train_acc, test_acc = model.evaluate(X_train, y_train, X_test, y_test)
-    print(f"Train Accuracy: {train_acc:.4f}")
-    print(f"Test Accuracy: {test_acc:.4f}")
-
-    model.save_model("xgboost_dyslexia_model_v1.json")"""
-
-    print(X_train[0])
     model = XGBoostModel.from_file("xgboost_dyslexia_model_v1.json")
     # Example prediction (replace with actual data)
     prediction = model.predict(X_train[0].reshape(1, -1))
