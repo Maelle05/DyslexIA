@@ -1,3 +1,5 @@
+"""Core eye-tracking computations: head-pose estimation, gaze mapping, and the
+main OpenCV/MediaPipe capture loop."""
 from collections import deque
 import math
 import cv2
@@ -12,6 +14,18 @@ import time
 # ══════════════════════════════════════════════════════════════════════════════
 
 def compute_scale(pts):
+    """Compute the mean pairwise Euclidean distance between a set of 3-D points.
+
+    Used to estimate the apparent size of the nose landmark cluster so that
+    gaze offsets can be corrected for varying subject-to-camera distances.
+
+    Args:
+        pts: Array of shape ``(n, 3)``.
+
+    Returns:
+        Mean pairwise distance as a float, or ``1.0`` if fewer than two points
+        are provided (prevents division-by-zero downstream).
+    """
     n = len(pts); total = 0; count = 0
     for i in range(n):
         for j in range(i+1, n):
@@ -19,6 +33,25 @@ def compute_scale(pts):
     return total/count if count else 1.0
 
 def compute_head_frame(lms, indices, ref, w, h):
+    """Estimate a stable head-pose rotation matrix from a cluster of landmarks.
+
+    Performs PCA on the selected nose landmarks to derive three principal axes,
+    enforces a right-handed coordinate system, and sign-aligns the result with
+    the first frame's reference rotation so axes don't flip between frames.
+
+    Args:
+        lms: Sequence of MediaPipe ``NormalizedLandmark`` objects.
+        indices: Indices into ``lms`` that form the nose cluster.
+        ref: Single-element list ``[R | None]`` used to store the reference
+            rotation across calls (mutated in-place on first call).
+        w: Camera frame width in pixels.
+        h: Camera frame height in pixels.
+
+    Returns:
+        A tuple ``(centroid, R, pts)`` where ``centroid`` is the 3-D mean of
+        the cluster, ``R`` is the ``(3, 3)`` rotation matrix, and ``pts`` is
+        the ``(n, 3)`` array of landmark coordinates.
+    """
     pts = np.array([[lms[i].x*w, lms[i].y*h, lms[i].z*w] for i in indices])
     c = np.mean(pts, axis=0)
     eigvals, eigvecs = np.linalg.eigh(np.cov((pts-c).T))
@@ -33,6 +66,18 @@ def compute_head_frame(lms, indices, ref, w, h):
     return c, R, pts
 
 def gaze_to_angles(d):
+    """Convert a 3-D unit gaze vector to yaw and pitch angles in degrees.
+
+    The convention is camera-space where ``-Z`` is straight ahead: positive yaw
+    is right, positive pitch is down (before the final sign flip applied here).
+
+    Args:
+        d: 3-D gaze direction vector (need not be normalised).
+
+    Returns:
+        A tuple ``(yaw_deg, pitch_deg)`` where yaw is positive to the right and
+        pitch is positive downward, both in degrees.
+    """
     d = d/np.linalg.norm(d)
     xz = np.array([d[0],0,d[2]]); xz /= np.linalg.norm(xz)
     yaw = math.acos(np.clip(np.dot([0,0,-1], xz), -1, 1))
@@ -43,12 +88,39 @@ def gaze_to_angles(d):
     return -math.degrees(yaw), math.degrees(pitch)
 
 def fit_map(samples):
+    """Fit a linear mapping from gaze angles to screen pixel coordinates.
+
+    Solves two independent least-squares problems (one per screen axis) using
+    the 9 calibration samples collected during the calibration phase.
+
+    Args:
+        samples: List of ``(yaw, pitch, screen_x, screen_y)`` tuples collected
+            at known calibration point positions.
+
+    Returns:
+        A tuple ``(cx, cy)`` of 3-element coefficient vectors for the affine
+        mapping ``screen_x = cx[0]*yaw + cx[1]*pitch + cx[2]`` (and similarly
+        for ``cy``).
+    """
     X = np.column_stack([[s[0] for s in samples], [s[1] for s in samples], np.ones(len(samples))])
     cx, *_ = np.linalg.lstsq(X, [s[2] for s in samples], rcond=None)
     cy, *_ = np.linalg.lstsq(X, [s[3] for s in samples], rcond=None)
     return cx, cy
 
 def apply_map(yaw, pitch, cx, cy):
+    """Apply a calibrated linear mapping to obtain screen coordinates.
+
+    Args:
+        yaw: Horizontal gaze angle in degrees.
+        pitch: Vertical gaze angle in degrees.
+        cx: X-axis coefficient vector from :func:`fit_map`.
+        cy: Y-axis coefficient vector from :func:`fit_map`.
+
+    Returns:
+        A tuple ``(x, y)`` of integer pixel coordinates clipped to
+        ``[10, MONITOR_WIDTH-10]`` × ``[10, MONITOR_HEIGHT-10]`` to avoid
+        off-screen values.
+    """
     return (int(np.clip(cx[0]*yaw+cx[1]*pitch+cx[2], 10, MONITOR_WIDTH-10)),
             int(np.clip(cy[0]*yaw+cy[1]*pitch+cy[2], 10, MONITOR_HEIGHT-10)))
 
@@ -57,6 +129,31 @@ def apply_map(yaw, pitch, cx, cy):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def eye_tracking_loop(shared):
+    """Main eye-tracking capture loop, intended to run in a background thread.
+
+    Opens the default webcam, processes each frame with MediaPipe FaceMesh, and
+    writes gaze coordinates and JPEG thumbnails to the ``shared`` state dict.
+    The loop also handles calibration point capture and reset signals from the
+    Streamlit UI.
+
+    Args:
+        shared: Thread-safe state dictionary with the following keys:
+
+            - ``lock`` (threading.Lock): guards all reads/writes.
+            - ``running`` (bool): set to ``False`` to stop the loop.
+            - ``do_capture`` (bool): pulse to ``True`` to capture a calibration
+              sample for the current calibration point.
+            - ``do_reset`` (bool): pulse to ``True`` to restart calibration.
+            - ``calib_step`` (int): current calibration step (0–8), or ``-1``
+              when idle, or ``10`` when done.
+            - ``calib_samples`` (list): accumulated ``(yaw, pitch, x, y)`` tuples.
+            - ``calibrated`` (bool): set to ``True`` once 9 samples are fitted.
+            - ``recording`` (bool): when ``True``, gaze entries are appended to
+              ``gaze_log``.
+            - ``gaze_log`` (list): list of gaze entry dicts.
+            - ``screen_xy`` (tuple): most recent ``(x, y)`` gaze position.
+            - ``frame_jpeg`` (bytes | None): latest JPEG-encoded camera frame.
+    """
     face_mesh = mp.solutions.face_mesh.FaceMesh(
         static_image_mode=False, max_num_faces=1, refine_landmarks=True,
         min_detection_confidence=0.5, min_tracking_confidence=0.5)

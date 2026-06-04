@@ -1,3 +1,15 @@
+"""Streamlit front-end for the dyslexia eye-tracking experiment.
+
+Manages the full user session: camera start/stop, a 9-point gaze calibration
+workflow, recording of gaze data during reading, CSV export, and result display
+after sending the recording to the prediction API.
+
+The application is single-threaded from Streamlit's perspective; the OpenCV /
+MediaPipe capture runs in a daemon ``threading.Thread`` and communicates through
+a shared ``dict`` protected by a ``threading.Lock``.  JavaScript injected via
+``st.components.v1.components.html`` handles the animated calibration dot and
+the real-time gaze cursor overlay in the parent browser window.
+"""
 import streamlit as st
 import threading
 import time

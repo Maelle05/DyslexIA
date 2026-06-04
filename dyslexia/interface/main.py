@@ -3,6 +3,16 @@ from dyslexia.model.xgboost import XGBoostModel
 from sklearn.preprocessing import StandardScaler
 
 def main():
+    """Run the full training and inference pipeline.
+
+    Steps:
+        1. Discover raw CSV files under the hard-coded data directory.
+        2. Build a feature dataset with :func:`~dyslexia.processing.process_data_justine.process_dataset`.
+        3. Split into train/test sets and apply standard scaling.
+        4. Load an existing model from ``xgboost_dyslexia_model_v1.json`` if
+           available; otherwise train a fresh model and print train/test accuracy.
+        5. Print the predicted class and probability for the first training sample.
+    """
     files_metrics, files_fixations = get_files_path("/home/yoannl/code/drealKn/DyslexIA/data/data")
     dataset = process_dataset(files_metrics, files_fixations)
     X_train, X_test, y_train, y_test = split(dataset)

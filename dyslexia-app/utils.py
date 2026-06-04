@@ -1,3 +1,14 @@
+"""Shared constants for the dyslexia eye-tracking Streamlit application.
+
+Provides:
+    - ``READING_TEXT``: the French passage displayed to subjects.
+    - ``MONITOR_WIDTH`` / ``MONITOR_HEIGHT``: screen dimensions in pixels,
+      queried once at import time via :func:`pyautogui.size`.
+    - ``CALIB_POINTS_PCT``: 9 calibration point positions as ``(x, y)``
+      fractions of the monitor dimensions (3 × 3 grid).
+    - ``NOSE_INDICES``: MediaPipe FaceMesh landmark indices used to build the
+      head-pose reference frame.
+"""
 import pyautogui
 
 # ── Texte à lire ──────────────────────────────────────────────────────────────

@@ -5,6 +5,17 @@ import re
 from sklearn.model_selection import train_test_split
 
 def get_files_path(folder_path):
+    """Scan a directory for per-subject eye-tracking CSVs.
+
+    Args:
+        folder_path: Path to the directory containing Subject CSV files.
+
+    Returns:
+        A tuple (files_metrics, files_fixations) where each element is a list
+        of absolute file paths matching the naming convention
+        ``Subject_<N>_T4_Meaningful_Text_metrics.csv`` or
+        ``Subject_<N>_T4_Meaningful_Text_fixations.csv``.
+    """
     files_metrics = []
     files_fixations = []
 
@@ -17,6 +28,21 @@ def get_files_path(folder_path):
     return files_metrics, files_fixations
 
 def process_dataset(files_metrics, files_fixations):
+    """Build a labelled feature DataFrame from raw metrics and fixation CSVs.
+
+    Joins fixation-level statistics (duration std, spatial dispersion, line
+    coverage) with trial-level metrics (mean fixation duration, saccade
+    amplitude, fixation count) and then merges the class labels from
+    ``../../data/dyslexia_class_label.csv``.
+
+    Args:
+        files_metrics: List of paths to ``*_metrics.csv`` files.
+        files_fixations: List of paths to ``*_fixations.csv`` files.
+
+    Returns:
+        A ``pd.DataFrame`` with one row per subject, containing feature columns
+        and a ``class_id`` column (0 = non-dyslexic, 1 = dyslexic).
+    """
     fix_dict = {}
 
     for f in files_fixations:
@@ -59,6 +85,16 @@ def process_dataset(files_metrics, files_fixations):
     return dataset
 
 def split(dataset):
+    """Stratified train/test split of a feature dataset.
+
+    Args:
+        dataset: DataFrame returned by :func:`process_dataset`. Must contain
+            ``sid`` and ``class_id`` columns.
+
+    Returns:
+        A tuple ``(X_train, X_test, y_train, y_test)`` with an 80/20 split
+        stratified by ``class_id``.
+    """
     X = dataset.drop(columns=["sid", "class_id"]).values
     y = dataset["class_id"].values
 
