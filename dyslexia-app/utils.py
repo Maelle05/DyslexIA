@@ -11,10 +11,12 @@ Provides:
 """
 import pyautogui
 
-# ── Texte à lire ──────────────────────────────────────────────────────────────
-READING_TEXT = """J’ai ainsi vécu seul, sans personne avec qui parler véritablement, jusqu’à une panne dans le désert du Sahara, il y a six ans.
+# ── Texte à lire ─────────────────────────────────────────────────────────────
+READING_TEXT = """J’ai ainsi vécu seul, sans personne avec qui parler véritablement,
+jusqu’à une panne dans le désert du Sahara, il y a six ans.
 Quelque chose s’était cassé dans mon moteur.
-Et comme je n’avais avec moi ni mécanicien, ni passagers, je me préparai à essayer de réussir, tout seul, une réparation difficile.
+Et comme je n’avais avec moi ni mécanicien, ni passagers,
+je me préparai à essayer de réussir, tout seul, une réparation difficile.
 C’était pour moi une question de vie ou de mort.
 J’avais à peine de l’eau à boire pour huit jours.
 Le premier soir je me suis donc endormi sur le sable à mille milles de toute terre habitée.

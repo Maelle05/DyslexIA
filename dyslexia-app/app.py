@@ -103,15 +103,19 @@ with col_ctrl:
     if not running:
         if st.button("▶ Démarrer la caméra", use_container_width=True):
             with S["lock"]:
-                S["running"]=True; S["calib_step"]=-1
-                S["calib_samples"]=[]; S["calibrated"]=False
+                S["running"] = True
+                S["calib_step"] = -1
+                S["calib_samples"] = []
+                S["calibrated"] = False
             t = threading.Thread(target=eye_tracking_loop, args=(S,), daemon=True)
-            t.start(); S["thread"]=t
+            t.start()
+            S["thread"] = t
             st.rerun()
     else:
         if st.button("⏹ Arrêter la caméra", use_container_width=True):
             with S["lock"]:
-                S["running"]=False; S["recording"]=False
+                S["running"] = False
+                S["recording"] = False
             st.rerun()
 
     st.divider()
@@ -123,23 +127,30 @@ with col_ctrl:
     if calib_step == -1:
         if st.button("🎯 Lancer la calibration", disabled=not running, use_container_width=True):
             with S["lock"]:
-                S["calib_step"]=0; S["calib_samples"]=[]; S["calibrated"]=False
+                S["calib_step"] = 0
+                S["calib_samples"] = []
+                S["calibrated"] = False
             st.rerun()
 
     elif 0 <= calib_step <= 8:
         st.info(f"**Point {calib_step+1} / 9**\nFixez le point rouge")
         st.progress(calib_step/9, text=f"{calib_step}/9")
         if st.button(f"✅ Capturer point {calib_step+1}", use_container_width=True, type="primary"):
-            with S["lock"]: S["do_capture"]=True
-            time.sleep(0.15); st.rerun()
+            with S["lock"]:
+                S["do_capture"] = True
+            time.sleep(0.15)
+            st.rerun()
         if st.button("✖ Annuler", use_container_width=True):
-            with S["lock"]: S["calib_step"]=-1; S["calib_samples"]=[]
+            with S["lock"]:
+                S["calib_step"] = -1
+                S["calib_samples"] = []
             st.rerun()
 
     elif calib_step == 10:
         st.success("✅ Calibration terminée !")
         if st.button("🔄 Recalibrer", use_container_width=True):
-            with S["lock"]: S["do_reset"]=True
+            with S["lock"]:
+                S["do_reset"] = True
             st.rerun()
 
     st.divider()
@@ -147,7 +158,7 @@ with col_ctrl:
     # ── Enregistrement ────────────────────────────────────────────────────────
     with S["lock"]:
         recording = S["recording"]
-        n_log     = len(S["gaze_log"])
+        n_log = len(S["gaze_log"])
 
     st.subheader("Enregistrement")
 
@@ -156,7 +167,8 @@ with col_ctrl:
         btn_disabled = not calibrated
         if st.button(btn_label, disabled=btn_disabled, use_container_width=True, type="primary"):
             with S["lock"]:
-                S["recording"]=True; S["gaze_log"]=[]
+                S["recording"] = True
+                S["gaze_log"] = []
             st.rerun()
     else:
         st.error(f"🔴 Enregistrement en cours… {n_log} pts")
@@ -171,7 +183,22 @@ with col_ctrl:
         st.success("✅ Enregistrement terminé")
 
         out = io.StringIO()
-        writer = csv.DictWriter(out, fieldnames=["time", "fix_x", "fix_y", "gaze_x_left", "gaze_y_left", "gaze_x_right", "gaze_y_right"])
+        writer = csv.DictWriter(
+            out,
+            fieldnames=[
+                "time",
+                "fix_x",
+                "fix_y",
+                "angle1_l",
+                "angle2_l",
+                "angle1_r",
+                "angle2_r",
+                "gaze_x_left",
+                "gaze_y_left",
+                "gaze_x_right",
+                "gaze_y_right"
+                ]
+            )
         writer.writeheader()
         writer.writerows(S["download_data"])
 
@@ -182,12 +209,23 @@ with col_ctrl:
 
         if csv_data:
             if st.button('Envoyer les résultats'):
-                response = requests.post('http://localhost:8000/predict', files={"csv_file": csv_bytes})
+                response = requests.post(
+                    'http://localhost:8000/predict',
+                    files={"csv_file": csv_bytes}
+                )
                 if response.status_code == 200:
                     S["api_result"] = response.json()
                 else:
                     S["api_result"] = f"Error {response.status_code}: {response.text}"
                 st.rerun()
+
+        st.download_button(
+            label="💾 Télécharger CSV",
+            data=csv_data,
+            file_name="gaze_log.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
 
     # Miniature caméra en bas de la colonne
     st.divider()
@@ -204,7 +242,7 @@ with col_ctrl:
 with col_main:
     with S["lock"]:
         calibrated = S["calibrated"]
-        recording  = S["recording"]
+        recording = S["recording"]
 
     st.markdown("#### Texte à lire")
     st.markdown(
@@ -224,27 +262,46 @@ with col_main:
         st.markdown("#### Résultats")
         st.write(S["api_result"])
 
+
 # ══════════════════════════════════════════════════════════════════════════════
 # ── Dispatch JS ───────────────────────────────────────────────────────────────
 # ══════════════════════════════════════════════════════════════════════════════
 
 with S["lock"]:
-    sx, sy     = S["screen_xy"]
+    sx, sy = S["screen_xy"]
     is_running = S["running"]
-    is_cal     = S["calibrated"]
-    step       = S["calib_step"]
+    is_cal = S["calibrated"]
+    step = S["calib_step"]
 
 if is_running and is_cal and MONITOR_WIDTH > 0:
-    px=sx/MONITOR_WIDTH; py=sy/MONITOR_HEIGHT
-    components.html(f"<script>window.parent.dispatchEvent(new CustomEvent('gazeUpdate',{{detail:{{px:{px:.4f},py:{py:.4f}}}}}));</script>", height=0)
+    px = sx / MONITOR_WIDTH
+    py = sy / MONITOR_HEIGHT
+    components.html(
+            f"""<script>
+            window.parent.dispatchEvent(new CustomEvent('gazeUpdate',{{detail:{{px:{px:.4f},py:{py:.4f}}}}}));
+            </script>""",
+            height=0
+        )
 else:
-    components.html("<script>window.parent.dispatchEvent(new CustomEvent('gazeHide'));</script>", height=0)
+    components.html(
+            "<script>window.parent.dispatchEvent(new CustomEvent('gazeHide'));</script>",
+            height=0
+        )
 
 if is_running and 0 <= step <= 8:
-    ppx,ppy = CALIB_POINTS_PCT[step]
-    components.html(f"<script>window.parent.dispatchEvent(new CustomEvent('calibPoint',{{detail:{{px:{ppx},py:{ppy},step:{step+1}}}}}));</script>", height=0)
+    ppx, ppy = CALIB_POINTS_PCT[step]
+    components.html(
+            f"""<script>
+            window.parent.dispatchEvent(new CustomEvent('calibPoint',{{detail:{{px:{ppx},py:{ppy},step:{step+1}}}}}));
+            </script>""",
+            height=0
+        )
+
 else:
-    components.html("<script>window.parent.dispatchEvent(new CustomEvent('calibHide'));</script>", height=0)
+    components.html(
+            "<script>window.parent.dispatchEvent(new CustomEvent('calibHide'));</script>",
+            height=0
+        )
 
 if S["running"]:
     time.sleep(0.1)
