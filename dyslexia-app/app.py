@@ -1,93 +1,41 @@
 """Streamlit front-end for the dyslexia eye-tracking experiment.
 
-Manages the full user session: camera start/stop, a 9-point gaze calibration
-workflow, recording of gaze data during reading, CSV export, and result display
-after sending the recording to the prediction API.
+Manages the full user session: camera start/stop, recording of gaze angles
+during reading, CSV export, and result display after sending the recording
+to the prediction API.
 
 The application is single-threaded from Streamlit's perspective; the OpenCV /
 MediaPipe capture runs in a daemon ``threading.Thread`` and communicates through
-a shared ``dict`` protected by a ``threading.Lock``.  JavaScript injected via
-``st.components.v1.components.html`` handles the animated calibration dot and
-the real-time gaze cursor overlay in the parent browser window.
+a shared ``dict`` protected by a ``threading.Lock``.
 """
 import streamlit as st
 import threading
 import time
 import csv
 import io
-import streamlit.components.v1 as components
-from utils import MONITOR_HEIGHT, MONITOR_WIDTH, READING_TEXT, CALIB_POINTS_PCT
-from eye_tracking.computing import eye_tracking_loop
 import requests
+from utils import READING_TEXT
+from eye_tracking.computing import eye_tracking_loop
 
 st.set_page_config(page_title="Eye Tracking", page_icon="👁️", layout="wide")
 
 # ── Shared state ──────────────────────────────────────────────────────────────
 if "state" not in st.session_state:
     st.session_state.state = {
-        "lock": threading.Lock(),
-        "running": False,
-        "frame_jpeg": None,
-        "screen_xy": (0, 0),
-        "calibrated": False,
-        "calib_step": -1,
-        "do_capture": False,
-        "do_reset": False,
-        "calib_samples": [],
-        "recording": False,
-        "gaze_log": [],        # liste de {"t": timestamp, "x": px, "y": py}
-        "thread": None,
+        "lock":             threading.Lock(),
+        "running":          False,
+        "tracking":         False,   # True once first face is detected
+        "frame_jpeg":       None,
+        "recording":        False,
+        "gaze_log":         [],
+        "thread":           None,
         "pending_download": False,
-        "download_data": None,
-        "api_result": None,
+        "download_data":    None,
+        "api_result":       None,
+        "fps":              None,
     }
 
 S = st.session_state.state
-
-# ══════════════════════════════════════════════════════════════════════════════
-# ── Injection JS (point vert + point calibration) ─────────────────────────────
-# ══════════════════════════════════════════════════════════════════════════════
-
-components.html("""
-<script>
-(function(){
-  const W=window.parent,D=W.document;
-  if(!D.getElementById('calib-dot')){
-    const c=D.createElement('div'); c.id='calib-dot';
-    c.style.cssText='position:fixed;width:24px;height:24px;border-radius:50%;background:#ff1744;border:3px solid #fff;pointer-events:none;z-index:999998;transform:translate(-50%,-50%);display:none;';
-    const lbl=D.createElement('div'); lbl.id='calib-lbl';
-    lbl.style.cssText='position:fixed;transform:translateX(-50%);color:#fff;font-size:12px;font-family:sans-serif;background:rgba(0,0,0,.65);padding:2px 10px;border-radius:14px;pointer-events:none;z-index:999998;display:none;white-space:nowrap;';
-    const num=D.createElement('div'); num.id='calib-num';
-    num.style.cssText='position:fixed;color:#fff;font-size:10px;font-weight:bold;font-family:sans-serif;pointer-events:none;z-index:1000000;transform:translate(-50%,-50%);display:none;';
-    const sty=D.createElement('style');
-    sty.textContent='@keyframes pc{0%{box-shadow:0 0 0 0 rgba(255,23,68,.7)}70%{box-shadow:0 0 0 14px rgba(255,23,68,0)}100%{box-shadow:0 0 0 0 rgba(255,23,68,0)}}#calib-dot.on{animation:pc 1s ease-out infinite}';
-    D.head.appendChild(sty);
-    D.body.appendChild(c); D.body.appendChild(lbl); D.body.appendChild(num);
-  }
-  W.addEventListener('gazeUpdate',e=>{
-    const d=D.getElementById('gaze-dot');
-    d.style.display='block';
-    d.style.left=(e.detail.px*100).toFixed(2)+'%';
-    d.style.top=(e.detail.py*100).toFixed(2)+'%';
-  });
-  W.addEventListener('gazeHide',()=>{const d=D.getElementById('gaze-dot');if(d)d.style.display='none';});
-  W.addEventListener('calibPoint',e=>{
-    const c=D.getElementById('calib-dot'),lbl=D.getElementById('calib-lbl'),num=D.getElementById('calib-num');
-    const px=e.detail.px*100,py=e.detail.py*100;
-    c.style.left=px+'%'; c.style.top=py+'%'; c.style.display='block'; c.classList.add('on');
-    lbl.style.left=px+'%'; lbl.style.top=`calc(${py}% + ${py>85?'-38px':'22px'})`;
-    lbl.textContent=`Point ${e.detail.step}/9 — Fixez et cliquez`; lbl.style.display='block';
-    num.style.left=px+'%'; num.style.top=py+'%'; num.textContent=e.detail.step; num.style.display='block';
-  });
-  W.addEventListener('calibHide',()=>{
-    ['calib-dot','calib-lbl','calib-num'].forEach(id=>{
-      const el=D.getElementById(id);
-      if(el){el.style.display='none';if(id==='calib-dot')el.classList.remove('on');}
-    });
-  });
-})();
-</script>
-""", height=0)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ── UI ────────────────────────────────────────────────────────────────────────
@@ -103,10 +51,8 @@ with col_ctrl:
     if not running:
         if st.button("▶ Démarrer la caméra", use_container_width=True):
             with S["lock"]:
-                S["running"] = True
-                S["calib_step"] = -1
-                S["calib_samples"] = []
-                S["calibrated"] = False
+                S["running"]  = True
+                S["tracking"] = False
             t = threading.Thread(target=eye_tracking_loop, args=(S,), daemon=True)
             t.start()
             S["thread"] = t
@@ -114,70 +60,53 @@ with col_ctrl:
     else:
         if st.button("⏹ Arrêter la caméra", use_container_width=True):
             with S["lock"]:
-                S["running"] = False
+                S["running"]   = False
                 S["recording"] = False
+                S["tracking"]  = False
             st.rerun()
 
     st.divider()
 
+    # ── Statut du tracking ────────────────────────────────────────────────────
     with S["lock"]:
-        calib_step = S["calib_step"]
-        calibrated = S["calibrated"]
+        tracking = S["tracking"]
 
-    if calib_step == -1:
-        if st.button("🎯 Lancer la calibration", disabled=not running, use_container_width=True):
-            with S["lock"]:
-                S["calib_step"] = 0
-                S["calib_samples"] = []
-                S["calibrated"] = False
-            st.rerun()
-
-    elif 0 <= calib_step <= 8:
-        st.info(f"**Point {calib_step+1} / 9**\nFixez le point rouge")
-        st.progress(calib_step/9, text=f"{calib_step}/9")
-        if st.button(f"✅ Capturer point {calib_step+1}", use_container_width=True, type="primary"):
-            with S["lock"]:
-                S["do_capture"] = True
-            time.sleep(0.15)
-            st.rerun()
-        if st.button("✖ Annuler", use_container_width=True):
-            with S["lock"]:
-                S["calib_step"] = -1
-                S["calib_samples"] = []
-            st.rerun()
-
-    elif calib_step == 10:
-        st.success("✅ Calibration terminée !")
-        if st.button("🔄 Recalibrer", use_container_width=True):
-            with S["lock"]:
-                S["do_reset"] = True
-            st.rerun()
+    if running and not tracking:
+        st.info("👁️ En attente du visage…")
+    elif running and tracking:
+        with S["lock"]:
+            fps = S["fps"]
+        fps_str = f" — {fps} fps" if fps else ""
+        st.success(f"✅ Visage détecté{fps_str}")
 
     st.divider()
 
     # ── Enregistrement ────────────────────────────────────────────────────────
     with S["lock"]:
         recording = S["recording"]
-        n_log = len(S["gaze_log"])
+        n_log     = len(S["gaze_log"])
 
     st.subheader("Enregistrement")
 
     if not recording:
-        btn_label = "⏺ Démarrer l'enregistrement"
-        btn_disabled = not calibrated
-        if st.button(btn_label, disabled=btn_disabled, use_container_width=True, type="primary"):
+        if st.button(
+            "⏺ Démarrer l'enregistrement",
+            disabled=not tracking,
+            use_container_width=True,
+            type="primary",
+        ):
             with S["lock"]:
                 S["recording"] = True
-                S["gaze_log"] = []
+                S["gaze_log"]  = []
             st.rerun()
     else:
         st.error(f"🔴 Enregistrement en cours… {n_log} pts")
 
         if st.button("⏹ Arrêter l'enregistrement", use_container_width=True):
             with S["lock"]:
-                S["recording"] = False
+                S["recording"]        = False
                 S["pending_download"] = True
-                S["download_data"] = list(S["gaze_log"]) if S["gaze_log"] else []
+                S["download_data"]    = list(S["gaze_log"]) if S["gaze_log"] else []
 
     if S.get("pending_download") and S.get("download_data"):
         st.success("✅ Enregistrement terminé")
@@ -185,33 +114,20 @@ with col_ctrl:
         out = io.StringIO()
         writer = csv.DictWriter(
             out,
-            fieldnames=[
-                "time",
-                "fix_x",
-                "fix_y",
-                "angle1_l",
-                "angle2_l",
-                "angle1_r",
-                "angle2_r",
-                "gaze_x_left",
-                "gaze_y_left",
-                "gaze_x_right",
-                "gaze_y_right"
-                ]
-            )
+            fieldnames=["time", "angle1_l", "angle2_l", "angle1_r", "angle2_r"],
+        )
         writer.writeheader()
         writer.writerows(S["download_data"])
-
         csv_data = out.getvalue()
 
         csv_bytes = io.BytesIO(csv_data.encode("utf-8"))
         csv_bytes.name = "gaze_log.csv"
 
         if csv_data:
-            if st.button('Envoyer les résultats'):
+            if st.button("Envoyer les résultats"):
                 response = requests.post(
-                    'http://localhost:8000/predict',
-                    files={"csv_file": csv_bytes}
+                    "http://localhost:8000/predict",
+                    files={"csv_file": csv_bytes},
                 )
                 if response.status_code == 200:
                     S["api_result"] = response.json()
@@ -227,23 +143,18 @@ with col_ctrl:
             use_container_width=True,
         )
 
-    # Miniature caméra en bas de la colonne
+    # ── Miniature caméra ──────────────────────────────────────────────────────
     st.divider()
     with S["lock"]:
         jpeg = S["frame_jpeg"]
     if jpeg:
-        st.image(jpeg, use_container_width=True,
-                 caption="Caméra")
+        st.image(jpeg, use_container_width=True, caption="Caméra")
     else:
         st.caption("Caméra inactive")
 
 
 # ── Colonne principale : texte à lire ─────────────────────────────────────────
 with col_main:
-    with S["lock"]:
-        calibrated = S["calibrated"]
-        recording = S["recording"]
-
     st.markdown("#### Texte à lire")
     st.markdown(
         f"<div style='"
@@ -257,52 +168,15 @@ with col_main:
         unsafe_allow_html=True,
     )
 
-    if S["api_result"] is not None:
+    with S["lock"]:
+        api_result = S["api_result"]
+    if api_result is not None:
         st.divider()
         st.markdown("#### Résultats")
-        st.write(S["api_result"])
+        st.write(api_result)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# ── Dispatch JS ───────────────────────────────────────────────────────────────
-# ══════════════════════════════════════════════════════════════════════════════
-
-with S["lock"]:
-    sx, sy = S["screen_xy"]
-    is_running = S["running"]
-    is_cal = S["calibrated"]
-    step = S["calib_step"]
-
-if is_running and is_cal and MONITOR_WIDTH > 0:
-    px = sx / MONITOR_WIDTH
-    py = sy / MONITOR_HEIGHT
-    components.html(
-            f"""<script>
-            window.parent.dispatchEvent(new CustomEvent('gazeUpdate',{{detail:{{px:{px:.4f},py:{py:.4f}}}}}));
-            </script>""",
-            height=0
-        )
-else:
-    components.html(
-            "<script>window.parent.dispatchEvent(new CustomEvent('gazeHide'));</script>",
-            height=0
-        )
-
-if is_running and 0 <= step <= 8:
-    ppx, ppy = CALIB_POINTS_PCT[step]
-    components.html(
-            f"""<script>
-            window.parent.dispatchEvent(new CustomEvent('calibPoint',{{detail:{{px:{ppx},py:{ppy},step:{step+1}}}}}));
-            </script>""",
-            height=0
-        )
-
-else:
-    components.html(
-            "<script>window.parent.dispatchEvent(new CustomEvent('calibHide'));</script>",
-            height=0
-        )
-
+# ── Boucle de rafraîchissement ────────────────────────────────────────────────
 if S["running"]:
     time.sleep(0.1)
     st.rerun()
