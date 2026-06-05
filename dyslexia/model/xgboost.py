@@ -1,6 +1,7 @@
 import xgboost as xgb
 from sklearn.metrics import accuracy_score
 
+
 class XGBoostModel:
     """XGBoost classifier wrapper for dyslexia detection.
 
@@ -23,7 +24,17 @@ class XGBoostModel:
         instance.model.load_model(file_path)
         return instance
 
-    def __init__(self, X_train, y_train, learning_rate=0.05, max_depth=2, n_estimators=50, reg_lambda=1.0, reg_alpha=0.1, min_child_weight=3, imbalance_ratio=1):
+    def __init__(
+            self,
+            X_train,
+            y_train,
+            learning_rate=0.05,
+            max_depth=2,
+            n_estimators=50,
+            reg_lambda=1.0,
+            reg_alpha=0.1,
+            min_child_weight=3,
+            imbalance_ratio=1):
         """Train a new XGBoost classifier.
 
         Args:
@@ -35,7 +46,7 @@ class XGBoostModel:
             reg_lambda: L2 regularisation term.
             reg_alpha: L1 regularisation term.
             min_child_weight: Minimum sum of instance weight in a child node.
-            imbalance_ratio: ``scale_pos_weight`` — ratio of negative to positive
+            imbalance_ratio: `scale_pos_weight` — ratio of negative to positive
                 samples, used to handle class imbalance.
         """
         self.model = xgb.XGBClassifier(
@@ -83,7 +94,7 @@ class XGBoostModel:
             y_test: Test labels.
 
         Returns:
-            A tuple ``(train_accuracy, test_accuracy)`` as floats in ``[0, 1]``.
+            A tuple `(train_accuracy, test_accuracy)` as floats in `[0, 1]`.
         """
         y_train_pred = self.predict(X_train)
         y_test_pred = self.predict(X_test)
