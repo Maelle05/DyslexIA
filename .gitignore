@@ -1,5 +1,8 @@
 .env
-/data
-*.csv
+/data/*
+eyes-tracking/exports/*.csv
+eyes-tracking/*.csv
 *.png
 .python-version
+/__pycache__/*.pyc
+/__pycache__/
