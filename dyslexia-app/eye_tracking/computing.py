@@ -168,7 +168,6 @@ def eye_tracking_loop(shared):
         _, enc = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 72])
         with shared["lock"]:
             shared["frame_jpeg"] = enc.tobytes()
-        time.sleep(0.01)
 
     cap.release()
     face_mesh.close()
