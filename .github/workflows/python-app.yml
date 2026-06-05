@@ -35,4 +35,4 @@ jobs:
         flake8 dyslexia-app --max-line-length=250
     - name: Test with pytest
       run: |
-        pytest
+        pytest tests/*
