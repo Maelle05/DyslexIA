@@ -37,7 +37,7 @@ const errorMsg = ref('')
 /** Construit le CSV identique à ce que génère le Streamlit :
  *  colonnes : time, angle1_l, angle2_l, angle1_r, angle2_r */
 function buildCsv(session: SessionData): string {
-  const header = 'time,angle1_l,angle2_l,angle1_r,angle2_r'
+  const header = 'time,x_left,y_left,x_right,y_right'
   const rows = session.gazePoints.map(p =>
     `${p.t},${p.yaw_l},${p.pitch_l},${p.yaw_r},${p.pitch_r}`
   )
