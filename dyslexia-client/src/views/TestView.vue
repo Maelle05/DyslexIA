@@ -14,13 +14,13 @@
       :reading-text="readingText"
       @stop="onStop"
     />
-    <PredictionView v-if="step === 'prediction'" :session="sessionData" />
+    <PredictionView v-if="step === 'prediction'" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject, onMounted, onUnmounted, markRaw} from 'vue'
-import type { Ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
+import { useSessionStore } from '@/stores/session'
 import type { TestStep, SessionData } from '@/types'
 import CameraDetect   from '@/components/test/CameraDetect.vue'
 // import Calibration    from '@/components/test/Calibration.vue'
@@ -28,7 +28,7 @@ import Countdown      from '@/components/test/Countdown.vue'
 import ReadingSession from '@/components/test/ReadingSession.vue'
 import PredictionView from '@/components/test/PredictionView.vue'
 
-const sessionData = inject<Ref<SessionData | null>>('sessionData', ref(null))
+const store = useSessionStore()
 
 // ── Steps ──────────────────────────────────────────────────────────────────
 const steps: TestStep[] = ['camera', 'countdown', 'reading', 'prediction']
@@ -38,7 +38,7 @@ const step = computed(() => steps[stepIndex.value])
 function next() { if (stepIndex.value < steps.length - 1) stepIndex.value++ }
 
 // ── Texte de lecture ───────────────────────────────────────────────────────
-const readingText = `Le soleil se levait lentement sur la ville endormie. Marie ouvrit les yeux et regarda le plafond blanc de sa chambre. Elle aimait ces moments tranquilles du matin, avant que le monde ne s'éveille vraiment. Sur sa table de nuit, un livre attendait patiemment depuis trois jours.`
+const readingText = ref('Chargement du texte…')
 
 // ── Caméra + MediaPipe ────────────────────────────────────────────────────
 const videoRef = ref<HTMLVideoElement | null>(null)
@@ -52,6 +52,17 @@ async function onCameraReady() {
 const faceLandmarkerReady = ref(false)
 
 onMounted(async () => {
+  // Fetch du texte
+  try {
+    const response = await fetch('http://localhost:8000/passage', { method: 'GET' })
+    const data = await response.json()
+    readingText.value = data.text ?? 'Texte non disponible'
+  } catch (e) {
+    console.error('Texte error:', e)
+    readingText.value = 'Erreur lors du chargement du texte.'
+  }
+
+  // Init MediaPipe
   try {
     const { FaceLandmarker, FilesetResolver } = await import('@mediapipe/tasks-vision')
     const vision = await FilesetResolver.forVisionTasks(
@@ -86,7 +97,7 @@ function onCountdownDone() {
 
 // ── Arrêt session ──────────────────────────────────────────────────────────
 function onStop(data: SessionData) {
-  sessionData.value = data
+  store.save(data)
   next()
 }
 </script>

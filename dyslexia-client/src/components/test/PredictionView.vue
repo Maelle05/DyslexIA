@@ -16,17 +16,17 @@
     <!-- Résultat -->
     <div v-else-if="status === 'done' && result !== null">
       <p>✅ Analyse terminée</p>
-      <pre>{{ JSON.stringify(result, null, 2) }}</pre>
       <RouterLink to="/results">Voir le rapport</RouterLink>
+      <pre>{{ JSON.stringify(result, null, 2) }}</pre>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useSessionStore } from '@/stores/session'
 import type { SessionData } from '@/types'
-
-const props = defineProps<{ session: SessionData | null }>()
+const store = useSessionStore()
 
 const status = ref<'sending' | 'done' | 'error'>('sending')
 const result = ref<any>(null)
@@ -43,7 +43,7 @@ function buildCsv(session: SessionData): string {
 }
 
 async function send() {
-  if (!props.session) {
+  if (!store.data) {
     errorMsg.value = 'Aucune session disponible.'
     status.value = 'error'
     return
@@ -52,7 +52,7 @@ async function send() {
   status.value = 'sending'
 
   try {
-    const csv = buildCsv(props.session)
+    const csv = buildCsv(store.data)
     const blob = new Blob([csv], { type: 'text/csv' })
     const formData = new FormData()
     formData.append('csv_file', blob, 'gaze_log.csv')
