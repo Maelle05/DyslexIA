@@ -16,4 +16,13 @@ export interface SessionData {
   gazePoints: GazePoint[]
 }
 
+export interface CalibrationData {
+  leftSphereOffset: number[]   // offset local iris gauche
+  rightSphereOffset: number[]  // offset local iris droit
+  leftCalibScale: number
+  rightCalibScale: number
+  yawOffset: number
+  pitchOffset: number
+}
+
 export type TestStep = 'camera' | 'calibration' | 'countdown' | 'reading' | 'prediction'

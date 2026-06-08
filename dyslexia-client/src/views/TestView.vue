@@ -18,12 +18,19 @@
     </div>
 
     <CameraDetect   v-if="step === 'camera'"  :video="videoRef" :mediapipe-ready="faceLandmarkerReady"  @next="onCameraReady" />
-    <Calibration    v-if="step === 'calibration'" @next="next" />
+    <Calibration
+      v-if="step === 'calibration'"
+      :video="videoRef"
+      :face-landmarker="faceLandmarker"
+      @next="onCalibrationDone"
+    />
     <Countdown      v-if="step === 'countdown'"   @done="onCountdownDone" />
-    <ReadingSession v-if="step === 'reading'"
+    <ReadingSession
+      v-if="step === 'reading'"
       :face-landmarker="faceLandmarker"
       :video="videoRef"
       :reading-text="readingText"
+      :calib="calibData"
       @stop="onStop"
     />
     <PredictionView v-if="step === 'prediction'" />
@@ -33,9 +40,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
 import { useSessionStore } from '@/stores/session'
-import type { TestStep, SessionData } from '@/types'
+import type { TestStep, SessionData, CalibrationData} from '@/types'
+const calibData = ref<CalibrationData | null>(null)
 import CameraDetect   from '@/components/test/CameraDetect.vue'
-// import Calibration    from '@/components/test/Calibration.vue'
+import Calibration    from '@/components/test/Calibration.vue'
 import Countdown      from '@/components/test/Countdown.vue'
 import ReadingSession from '@/components/test/ReadingSession.vue'
 import PredictionView from '@/components/test/PredictionView.vue'
@@ -43,8 +51,7 @@ import PredictionView from '@/components/test/PredictionView.vue'
 const store = useSessionStore()
 
 // ── Steps ──────────────────────────────────────────────────────────────────
-const steps: TestStep[] = ['camera', 'countdown', 'reading', 'prediction']
-// const steps: TestStep[] = ['camera', 'calibration', 'countdown', 'reading', 'prediction']
+const steps: TestStep[] = ['camera', 'calibration', 'countdown', 'reading', 'prediction']
 const stepIndex = ref(0)
 const step = computed(() => steps[stepIndex.value])
 function next() { if (stepIndex.value < steps.length - 1) stepIndex.value++ }
@@ -63,6 +70,11 @@ async function onCameraReady() {
 }
 
 const faceLandmarkerReady = ref(false)
+
+function onCalibrationDone(data: CalibrationData) {
+  calibData.value = data
+  next()
+}
 
 onMounted(async () => {
   // Fetch du texte
