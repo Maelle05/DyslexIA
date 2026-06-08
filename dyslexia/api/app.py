@@ -9,6 +9,8 @@ from dyslexia.processing.text_generation import generate_passage
 from dyslexia.processing.process_v2 import process_data
 from fastapi.middleware.cors import CORSMiddleware
 
+OPTIMAL_THRESHOLD = 0.35
+
 app = FastAPI()
 
 origins = [
@@ -73,15 +75,12 @@ def predict(csv_file: Annotated[bytes, File()]):
 
     model = XGBoostModel.from_file("dyslexia/model/xgboost_dyslexia_model_v2.json")
 
-    prediction = model.predict(X.reshape(1, -1))
     prediction_proba = model.predict_proba(X.reshape(1, -1))
-
-    print(prediction[0].item())
-    print(prediction_proba[0][prediction[0]].item())
+    prediction = int(prediction_proba[0][-1] >= OPTIMAL_THRESHOLD)
 
     return {
-        "Prediction": prediction[0].item(),
-        "Probability": prediction_proba[0][prediction[0]].item()
+        "Prediction": "Dyslexique" if prediction else "Non-dyslexique",
+        "Probability": prediction_proba[0][prediction].item()
         }
 
 @app.get('/passage')

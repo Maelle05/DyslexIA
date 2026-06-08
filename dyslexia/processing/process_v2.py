@@ -38,6 +38,11 @@ def extract_features(df, gaze_cols=GAZE_COLS, target_len=TARGET_LEN):
     return np.array([mean_binocular_divergence, p90_vertical_velocity_left, saccade_rate_x_left, high_freq_band_energy_x_left])
 
 def process_data(X):
+    X['time'] = X['time'] - X['time'][0]
+    X['x_left'] = (X['x_left'] - X['x_left'].min()) / (X['x_left'].max() - X['x_left'].min())
+    X['y_left'] = (X['y_left'] - X['y_left'].min()) / (X['y_left'].max() - X['y_left'].min())
+    X['x_right'] = (X['x_right'] - X['x_right'].min()) / (X['x_right'].max() - X['x_right'].min())
+    X['y_right'] = (X['y_right'] - X['y_right'].min()) / (X['y_right'].max() - X['y_right'].min())
     X_processed = extract_features(X)
 
     return X_processed
