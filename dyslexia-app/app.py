@@ -19,18 +19,6 @@ from eye_tracking.computing import eye_tracking_loop
 
 st.set_page_config(page_title="Eye Tracking", page_icon="👁️", layout="wide")
 
-try:
-    text_request = requests.get('http://localhost:8000/passage')
-
-    if text_request.status_code == 200:
-        reading_text = text_request.json()['text']
-    else:
-        reading_text = READING_TEXT
-except requests.exceptions.ConnectionError:
-    reading_text = READING_TEXT
-
-
-
 # ── Shared state ──────────────────────────────────────────────────────────────
 if "state" not in st.session_state:
     st.session_state.state = {
@@ -45,7 +33,6 @@ if "state" not in st.session_state:
         "download_data":    None,
         "api_result":       None,
         "fps":              None,
-        "text":             reading_text,
     }
 
 S = st.session_state.state
@@ -127,7 +114,7 @@ with col_ctrl:
         out = io.StringIO()
         writer = csv.DictWriter(
             out,
-            fieldnames=["time", "angle1_l", "angle2_l", "angle1_r", "angle2_r"],
+            fieldnames=["time", "x_left", "y_left", "x_right", "y_right"],
         )
         writer.writeheader()
         writer.writerows(S["download_data"])
@@ -178,7 +165,7 @@ with col_main:
         f"background:var(--background-color);"
         f"border-radius:12px;"
         f"border:1px solid rgba(128,128,128,0.2);"
-        f"'>{S['text'].replace(chr(10), '<br>')}</div>",
+        f"'>{READING_TEXT.replace(chr(10), '<br>')}</div>",
         unsafe_allow_html=True,
     )
 

@@ -4,7 +4,9 @@ from io import BytesIO
 import numpy as np
 from fastapi import FastAPI, File
 import pandas as pd
+from dyslexia.model.xgboost import XGBoostModel
 from dyslexia.processing.text_generation import generate_passage
+from dyslexia.processing.process_v2 import process_data
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -65,9 +67,21 @@ def predict(csv_file: Annotated[bytes, File()]):
             dtype=None,
             encoding='utf-8'
         )
-    df = pd.DataFrame(array_data)
+    print(pd.DataFrame(array_data).shape)
+    X = process_data(pd.DataFrame(array_data))
+    print(X.reshape(1, -1).shape)
+
+    model = XGBoostModel.from_file("dyslexia/model/xgboost_dyslexia_model_v2.json")
+
+    prediction = model.predict(X.reshape(1, -1))
+    prediction_proba = model.predict_proba(X.reshape(1, -1))
+
+    print(prediction[0].item())
+    print(prediction_proba[0][prediction[0]].item())
+
     return {
-        "data": df.to_dict()
+        "Prediction": prediction[0].item(),
+        "Probability": prediction_proba[0][prediction[0]].item()
         }
 
 @app.get('/passage')

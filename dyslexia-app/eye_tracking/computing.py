@@ -156,10 +156,10 @@ def eye_tracking_loop(shared):
                 with shared["lock"]:
                     shared["gaze_log"].append({
                         "time":    time.time(),
-                        "angle1_l":   yaw_l,
-                        "angle2_l": pitch_l,
-                        "angle1_r":   yaw_r,
-                        "angle2_r": pitch_r,
+                        "x_left":   yaw_l,
+                        "y_left": pitch_l,
+                        "x_right":   yaw_r,
+                        "y_right": pitch_r,
                     })
 
             for lm in lms:
