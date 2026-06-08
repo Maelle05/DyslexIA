@@ -4,6 +4,7 @@ from io import BytesIO
 import numpy as np
 from fastapi import FastAPI, File
 import pandas as pd
+from processing.text_generation import generate_passage
 
 app = FastAPI()
 
@@ -51,6 +52,12 @@ def predict(csv_file: Annotated[bytes, File()]):
         )
     df = pd.DataFrame(array_data)
     return {
-        "result": "Tu es dyslexique Luca !",
         "data": df.to_dict()
         }
+
+@app.get('/passage')
+def generate_text():
+    text = generate_passage()
+    return {
+        "text": text
+    }
