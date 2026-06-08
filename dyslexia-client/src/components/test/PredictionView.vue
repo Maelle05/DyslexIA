@@ -16,10 +16,15 @@
     <!-- Résultat -->
     <div v-else-if="status === 'done' && result !== null" class="space-y-6">
       <p class="text-green-600 font-medium" >✅ Analyse terminée</p>
+
+      <div class="mt-10 text-xl bg-gray-50 p-4 rounded-lg overflow-auto font-semibold">
+        <p v-if="result.Prediction == 0">Non dyslexique à {{ Math.round(result.Probability * 100) }}%</p>
+        <p v-else>Dyslexique à {{ Math.round(result.Probability * 100) }}%</p>
+      </div>
+
       <RouterLink to="/results"
         class="inline-block border rounded-full px-6 py-2 hover:bg-gray-50 transition"
         >Voir le rapport</RouterLink>
-      <pre class="mt-6 text-left bg-gray-50 p-4 rounded-lg overflow-auto text-sm">{{ JSON.stringify(result, null, 2) }}</pre>
     </div>
   </div>
 </template>
