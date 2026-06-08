@@ -1,10 +1,12 @@
 <template>
-  <div>
-    <h2>Vérification de la caméra</h2>
-    <p v-if="!mediapipeReady" style="color:orange">⏳ Chargement du modèle IA…</p>
-    <p v-if="error" style="color:red">{{ error }}</p>
-    <p v-if="ready" style="color:green">Caméra détectée ✓</p>
-    <button :disabled="!ready || !mediapipeReady" @click="emit('next')">
+  <div class="max-w-md mx-auto text-center px-4 py-8">
+    <h2 class="text-2xl font-semibold mb-4" >Vérification de la caméra</h2>
+    <p v-if="!mediapipeReady" class="text-orange-500" >⏳ Chargement du modèle IA…</p>
+    <p v-if="error" class="text-red-500 mt-2">{{ error }}</p>
+    <p v-if="ready" class="text-green-600 mt-2">Caméra détectée ✓</p>
+    <button v-if="ready" :disabled="!ready || !mediapipeReady" @click="emit('next')"
+      class="mt-6 rounded-full px-5 py-2 border transition cursor-pointer hover:bg-gray-50"
+    >
       {{ !mediapipeReady ? 'Chargement…' : 'Continuer' }}
     </button>
   </div>

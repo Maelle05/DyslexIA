@@ -1,9 +1,11 @@
 <template>
-  <div>
-    <h2>Lecture en cours</h2>
-    <p>{{ readingText }}</p>
-    <p>⏱ {{ elapsed }}s — {{ gazePoints.length }} points enregistrés</p>
-    <button @click="stop">⏹ Arrêter et analyser</button>
+  <div class="max-w-6xl mx-auto text-center px-4 py-8">
+    <h2 class="text-2xl font-semibold mb-10" >Lecture en cours</h2>
+    <p class="text-lg text-left whitespace-pre-line leading-loose max-w-3xl mx-auto mb-8">{{ formattedText(readingText) }}</p>
+    <button
+    class="mt-6 rounded-full px-5 py-2 border transition cursor-pointer hover:bg-gray-50"
+    @click="stop">⏹ Arrêter et analyser</button>
+    <p class="mt-6 text-sm text-gray-600">⏱ {{ elapsed }}s — {{ gazePoints.length }} points enregistrés</p>
   </div>
 </template>
 
@@ -25,6 +27,10 @@ const gazePoints = ref<GazePoint[]>([])
 let animId: number
 let timerInterval: ReturnType<typeof setInterval>
 let startTime = 0
+
+function formattedText(text) {
+  return text.replaceAll('.', '.\n')
+}
 
 // ── Maths utilitaires ─────────────────────────────────────────────────────
 

@@ -1,23 +1,25 @@
 <template>
-  <div>
-    <h2>Analyse</h2>
+  <div class="max-w-6xl mx-auto text-center px-4 py-8">
+    <h2 class="text-2xl font-semibold mb-8">Analyse</h2>
 
     <!-- Envoi en cours -->
-    <div v-if="status === 'sending'">
+    <div v-if="status === 'sending'" class="text-gray-600">
       <p>⏳ Envoi des données…</p>
     </div>
 
     <!-- Erreur -->
-    <div v-else-if="status === 'error'">
-      <p style="color:red">{{ errorMsg }}</p>
-      <button @click="send">Réessayer</button>
+    <div v-else-if="status === 'error'" class="text-red-600">
+      <p class="mb-4">{{ errorMsg }}</p>
+      <button @click="send" class="rounded-lg border px-5 py-2 transition hover:bg-red-50 active:scale-95">Réessayer</button>
     </div>
 
     <!-- Résultat -->
-    <div v-else-if="status === 'done' && result !== null">
-      <p>✅ Analyse terminée</p>
-      <RouterLink to="/results">Voir le rapport</RouterLink>
-      <pre>{{ JSON.stringify(result, null, 2) }}</pre>
+    <div v-else-if="status === 'done' && result !== null" class="space-y-6">
+      <p class="text-green-600 font-medium" >✅ Analyse terminée</p>
+      <RouterLink to="/results"
+        class="inline-block border rounded-full px-6 py-2 hover:bg-gray-50 transition"
+        >Voir le rapport</RouterLink>
+      <pre class="mt-6 text-left bg-gray-50 p-4 rounded-lg overflow-auto text-sm">{{ JSON.stringify(result, null, 2) }}</pre>
     </div>
   </div>
 </template>

@@ -1,9 +1,21 @@
 <template>
-  <div>
-    <p>Étape {{ stepIndex + 1 }} / {{ steps.length }} — {{ step }}</p>
+  <div class="max-w-4xl mx-auto px-4 py-8 mt-15">
+    <p class="text-center text-gray-600">Step {{ stepIndex + 1 }} / {{ steps.length }}</p>
 
     <!-- Preview caméra toujours visible -->
-    <video ref="videoRef" autoplay playsinline muted style="width:160px; height:120px;" />
+    <div
+    class="fixed z-50 transition-all duration-1000"
+    :class="step === 'camera'
+        ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-0/2'
+        : 'bottom-4 right-4'"
+    >
+      <video ref="videoRef" autoplay playsinline muted
+        class="rounded-lg border shadow-lg transition-all duration-1000 shadow-xl ring-2 ring-black/10"
+        :class="step === 'camera'
+          ? 'h-[340px] w-[453px]'
+          : 'h-[120px] w-[160px]'"
+        />
+    </div>
 
     <CameraDetect   v-if="step === 'camera'"  :video="videoRef" :mediapipe-ready="faceLandmarkerReady"  @next="onCameraReady" />
     <Calibration    v-if="step === 'calibration'" @next="next" />

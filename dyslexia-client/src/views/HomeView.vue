@@ -1,15 +1,22 @@
 <template>
   <div>
-    <section ref="heroRef">
-      <h1>DyslexIA</h1>
-      <p>Dépistage de la dyslexie par eye-tracking en temps réel.</p>
-      <RouterLink to="/test">Commencer le test</RouterLink>
+    <section ref="heroRef" class="min-h-screen flex flex-col items-center justify-center text-center px-6">
+      <h1 class="font-display text-black-900 text-5xl font-bold">DyslexIA</h1>
+      <p class="mt-4 max-w-xl text-lg text-gray-600">Dépistage de la dyslexie par eye-tracking en temps réel.</p>
+      <RouterLink
+      to="/test"
+      class="mt-8 rounded-full border px-6 py-3 text-black hover:bg-gray-50"
+      >Commencer le test</RouterLink>
     </section>
 
-    <section ref="featuresRef">
-      <div v-for="f in features" :key="f.title" class="feature-card">
-        <h3>{{ f.title }}</h3>
-        <p>{{ f.desc }}</p>
+    <section ref="featuresRef"
+      class="grid gap-6 px-6 py-16 md:grid-cols-3"
+    >
+      <div v-for="f in features" :key="f.title"
+        class="rounded-xl border p-6 shadow-sm"
+      >
+        <h3 class="text-xl font-semibold" >{{ f.title }}</h3>
+        <p class="mt-2 text-gray-600">{{ f.desc }}</p>
       </div>
     </section>
   </div>
