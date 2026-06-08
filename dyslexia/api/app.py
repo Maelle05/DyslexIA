@@ -4,7 +4,7 @@ from io import BytesIO
 import numpy as np
 from fastapi import FastAPI, File
 import pandas as pd
-from processing.text_generation import generate_passage
+from dyslexia.processing.text_generation import generate_passage
 
 app = FastAPI()
 
