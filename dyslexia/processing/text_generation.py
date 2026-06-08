@@ -73,7 +73,7 @@ def _build_prompt(request: PassageRequest) -> str:
         f"dépasse 25 secondes) sur le sujet suivant : {topic}. Niveau de lecture "
         f"du public : {request.reading_level}. Utilise une prose claire et "
         f"naturelle en phrases complètes, sans titre, sans liste, sans "
-        f"guillemets. N'écris que le texte du passage, en français."
+        f"guillemets. N'écris que le texte du passage sans titre, en français."
     )
 
 
