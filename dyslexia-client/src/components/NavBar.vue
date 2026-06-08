@@ -26,8 +26,8 @@
 
 <script setup lang="ts">
 const links = [
-  { href: '/', label: 'Presentation' },
+  { href: '/', label: 'Présentation' },
   { href: '/test', label: 'Test' },
-  { href: '/results', label: 'Results' },
+  { href: '/results', label: 'Résultats' },
 ]
 </script>
