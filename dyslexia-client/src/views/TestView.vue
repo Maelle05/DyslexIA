@@ -58,6 +58,7 @@ const faceLandmarker = ref<any>(null)
 let stream: MediaStream | null = null
 
 async function onCameraReady() {
+  stream = videoRef.value?.srcObject as MediaStream ?? null
   next()
 }
 
@@ -99,12 +100,21 @@ onMounted(async () => {
 
 onUnmounted(() => {
   stream?.getTracks().forEach(t => t.stop())
+  stream = null
+
+  // Double sécurité via l'élément vidéo
+  if (videoRef.value) {
+    const s = videoRef.value.srcObject as MediaStream | null
+    s?.getTracks().forEach(t => t.stop())
+    videoRef.value.srcObject = null
+  }
+
   faceLandmarker.value?.close?.()
 })
 
 // ── Décompte terminé ───────────────────────────────────────────────────────
 function onCountdownDone() {
-  next() // passe à 'reading'
+  next()
 }
 
 // ── Arrêt session ──────────────────────────────────────────────────────────
