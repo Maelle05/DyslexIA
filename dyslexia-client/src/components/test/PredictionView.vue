@@ -18,8 +18,7 @@
       <p class="text-green-600 font-medium" >✅ Analyse terminée</p>
 
       <div class="mt-10 text-xl bg-gray-50 p-4 rounded-lg overflow-auto font-semibold">
-        <p v-if="result.Prediction == 0">Non dyslexique à {{ Math.round(result.Probability * 100) }}%</p>
-        <p v-else>Dyslexique à {{ Math.round(result.Probability * 100) }}%</p>
+        <p>{{ result.Prediction === 0 ? 'Non dyslexique' : 'Dyslexique' }} à {{ Math.round(result.Probability * 100) }}%</p>
       </div>
 
       <RouterLink to="/results"
