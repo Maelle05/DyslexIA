@@ -7,6 +7,7 @@ import pandas as pd
 from dyslexia_api.model.xgboost import XGBoostModel
 from dyslexia_api.processing.text_generation import generate_passage
 from dyslexia_api.processing.process_v2 import process_data
+from dyslexia_api.processing.text_question import get_passage
 from fastapi.middleware.cors import CORSMiddleware
 
 OPTIMAL_THRESHOLD = 0.35
@@ -19,6 +20,8 @@ origins = [
     "http://localhost:8000",
     "http://localhost:5173",
     "https://dyslexia.netlify.app"
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
@@ -89,4 +92,12 @@ def generate_text():
     text = generate_passage()
     return {
         "text": text
+    }
+
+@app.get('/text-question')
+def get_text_question():
+    result = get_passage()
+    return {
+        "text": result['text'],
+        "query": result['query']
     }

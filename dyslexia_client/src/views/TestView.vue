@@ -24,6 +24,7 @@
       :face-landmarker="faceLandmarker"
       @next="onCalibrationDone"
     />
+    <WarningQuestion v-if="step === 'warning-question'" @next="next"/>
     <Countdown      v-if="step === 'countdown'"   @done="onCountdownDone" />
     <ReadingSession
       v-if="step === 'reading'"
@@ -33,6 +34,12 @@
       :calib="calibData"
       @stop="onStop"
     />
+    <Question v-if="step === 'question'"
+      :question-text="questionText"
+      :a1-text="a1Text"
+      :a2-text="a2Text"
+      :a3-text="a3Text"
+      :a-text="aText" @next="next" @returnRead="returnRead"/>
     <PredictionView v-if="step === 'prediction'" />
   </div>
 </template>
@@ -44,6 +51,8 @@ import type { TestStep, SessionData, CalibrationData} from '@/types'
 const calibData = ref<CalibrationData | null>(null)
 import CameraDetect   from '@/components/test/CameraDetect.vue'
 import Calibration    from '@/components/test/Calibration.vue'
+import WarningQuestion    from '@/components/test/WarningQuestion.vue'
+import Question    from '@/components/test/Question.vue'
 import Countdown      from '@/components/test/Countdown.vue'
 import ReadingSession from '@/components/test/ReadingSession.vue'
 import PredictionView from '@/components/test/PredictionView.vue'
@@ -51,13 +60,22 @@ import PredictionView from '@/components/test/PredictionView.vue'
 const store = useSessionStore()
 
 // ── Steps ──────────────────────────────────────────────────────────────────
-const steps: TestStep[] = ['camera', 'calibration', 'countdown', 'reading', 'prediction']
+const steps: TestStep[] = ['camera', 'calibration', 'warning-question', 'countdown', 'reading', 'question', 'prediction']
 const stepIndex = ref(0)
 const step = computed(() => steps[stepIndex.value])
 function next() { if (stepIndex.value < steps.length - 1) stepIndex.value++ }
+function returnRead() {
+  store.clear()
+  stepIndex.value = steps.indexOf('countdown')
+}
 
 // ── Texte de lecture ───────────────────────────────────────────────────────
 const readingText = ref('Chargement du texte…')
+const questionText = ref('Chargement de la question…')
+const a1Text = ref('Chargement de la question…')
+const a2Text = ref('Chargement de la question…')
+const a3Text = ref('Chargement de la question…')
+const aText = ref('Chargement de la question…')
 
 // ── Caméra + MediaPipe ────────────────────────────────────────────────────
 const videoRef = ref<HTMLVideoElement | null>(null)
@@ -79,9 +97,16 @@ function onCalibrationDone(data: CalibrationData) {
 onMounted(async () => {
   // Fetch du texte
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/passage`, { method: 'GET' })
+    console.log(`${import.meta.env.VITE_API_URL}/text-question`)
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/text-question`, { method: 'GET' })
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
     const data = await response.json()
     readingText.value = data.text ?? 'Texte non disponible'
+    questionText.value = data.query.q ?? '? non disponible'
+    a1Text.value = data.query.a1 ?? '? non disponible'
+    a2Text.value = data.query.a2 ?? '? non disponible'
+    a3Text.value = data.query.a3 ?? '? non disponible'
+    aText.value = data.query.valid ?? 0
   } catch (e) {
     console.error('Texte error:', e)
     readingText.value = 'Erreur lors du chargement du texte.'

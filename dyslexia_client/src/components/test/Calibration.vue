@@ -11,7 +11,7 @@
 
     <!-- Étape 1 : lock des sphères oculaires -->
     <div v-if="calibStep === 'lock' && faceLocked">
-      <p class="mb-6">Regardez au centre de l'écran, cliquez sur le <strong>point rouge</strong></p>
+      <p class="mb-6">Regardez le point rouge et cliquez dessus</p>
       <button
         class="border w-10 h-10 bg-red-100 border-red-600 rounded-full hover:bg-red-600 cursor-pointer"
         @click="lockSpheres"
