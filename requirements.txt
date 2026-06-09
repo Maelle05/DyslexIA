@@ -7,3 +7,5 @@ opencv-python
 mediapipe==0.10.21
 scipy
 pyautogui
+uvicorn
+python-multipart
