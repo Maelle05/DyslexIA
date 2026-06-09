@@ -43,7 +43,6 @@ import {
   matTransposeVec,
   extractNosePts,
   extractIris,
-  gazeToAngles,
   computeEyeSpheres,
   computeGazeAngles,
 } from '@/lib/gazeUtils'

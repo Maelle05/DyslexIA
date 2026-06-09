@@ -25,4 +25,4 @@ export interface CalibrationData {
   pitchOffset: number
 }
 
-export type TestStep = 'camera' | 'calibration' | 'countdown' | 'reading' | 'prediction'
+export type TestStep = 'camera' | 'calibration' | 'warning-question' | 'question' | 'countdown' | 'reading' | 'prediction'

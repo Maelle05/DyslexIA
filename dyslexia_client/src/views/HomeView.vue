@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const heroRef = ref<HTMLElement>()
 const featuresRef = ref<HTMLElement>()

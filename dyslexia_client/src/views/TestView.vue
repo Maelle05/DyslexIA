@@ -39,7 +39,7 @@
       :a1-text="a1Text"
       :a2-text="a2Text"
       :a3-text="a3Text"
-      :a-text="aText" @next="next" @returnRead="returnRead"/>
+      :a-text="parseInt(aText)" @next="next" @returnRead="returnRead"/>
     <PredictionView v-if="step === 'prediction'" />
   </div>
 </template>
