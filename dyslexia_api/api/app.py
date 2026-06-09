@@ -29,6 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get('/')
 def index():
     """Return a placeholder link to the front-end application.
@@ -83,6 +84,7 @@ def predict(csv_file: Annotated[bytes, File()]):
         "Prediction": "Dyslexique" if prediction else "Non-dyslexique",
         "Probability": prediction_proba[0][prediction].item()
         }
+
 
 @app.get('/passage')
 def generate_text():

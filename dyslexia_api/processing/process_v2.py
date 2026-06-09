@@ -1,17 +1,20 @@
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
-pd.set_option('display.max_columns', None)
 from scipy.fft import fft
 
+pd.set_option('display.max_columns', None)
+
 TARGET_LEN = 2000
-GAZE_COLS  = ['x_left', 'y_left', 'x_right', 'y_right']
+GAZE_COLS = ['x_left', 'y_left', 'x_right', 'y_right']
+
 
 def to_fixed_length(signal, target_len):
     """Interpolation linéaire vers une longueur fixe."""
     x_old = np.linspace(0, 1, len(signal))
     x_new = np.linspace(0, 1, target_len)
     return interp1d(x_old, signal, kind='linear')(x_new)
+
 
 def extract_features(df, gaze_cols=GAZE_COLS, target_len=TARGET_LEN):
     signals = {}
@@ -36,6 +39,7 @@ def extract_features(df, gaze_cols=GAZE_COLS, target_len=TARGET_LEN):
     high_freq_band_energy_x_left = (energies / (np.sum(energies) + 1e-8))[9]
 
     return np.array([mean_binocular_divergence, p90_vertical_velocity_left, saccade_rate_x_left, high_freq_band_energy_x_left])
+
 
 def process_data(X):
     X['time'] = X['time'] - X['time'][0]
