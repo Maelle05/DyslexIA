@@ -64,7 +64,7 @@ async function send() {
     formData.append('csv_file', blob, 'gaze_log.csv')
     console.log(csv)
 
-    const response = await fetch('http://localhost:8000/predict', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/predict`, {
       method: 'POST',
       body: formData,
     })

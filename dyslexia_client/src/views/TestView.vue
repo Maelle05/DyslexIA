@@ -79,7 +79,7 @@ function onCalibrationDone(data: CalibrationData) {
 onMounted(async () => {
   // Fetch du texte
   try {
-    const response = await fetch('http://localhost:8000/passage', { method: 'GET' })
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/passage`, { method: 'GET' })
     const data = await response.json()
     readingText.value = data.text ?? 'Texte non disponible'
   } catch (e) {
