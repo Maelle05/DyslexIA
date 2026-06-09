@@ -1,9 +1,16 @@
 <template>
   <div class="max-w-6xl mx-auto text-center px-4 py-8">
     <h2 class="text-2xl font-semibold mb-10">Lecture en cours</h2>
-    <p class="text-lg text-left whitespace-pre-line leading-loose max-w-3xl mx-auto mb-8">
-      {{ formattedText(readingText) }}
-    </p>
+
+    <!-- Même rendu que GazeHeatmap -->
+    <div class="text-lg text-left leading-loose max-w-3xl mx-auto mb-8"
+         style="word-break: normal; overflow-wrap: break-word;">
+      <template v-for="(token, i) in words" :key="i">
+        <br v-if="token === '\n'" />
+        <span v-else :data-word="token" class="inline-block">{{ token }}&nbsp;</span>
+      </template>
+    </div>
+
     <button
       class="mt-6 rounded-full px-5 py-2 border transition cursor-pointer hover:bg-gray-50"
       @click="stop"
@@ -15,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import type { GazePoint, SessionData, CalibrationData } from '@/types/index'
 import {
   centroid,
@@ -25,6 +32,7 @@ import {
   computeEyeSpheres,
   computeGazeAngles,
 } from '@/lib/gazeUtils'
+import { splitIntoWords } from '@/lib/aoi'
 
 const props = defineProps<{
   video: HTMLVideoElement | null
@@ -45,6 +53,7 @@ let startTime = 0
 function formattedText(text: string): string {
   return text.replaceAll('.', '.\n')
 }
+const words = computed(() => splitIntoWords(formattedText(props.readingText)))
 
 onMounted(() => {
   startTime = Date.now()
@@ -109,7 +118,7 @@ onUnmounted(() => {
 function stop() {
   clearInterval(timerInterval)
   cancelAnimationFrame(animId)
-  console.log(gazePoints.value)
-  emit('stop', { gazePoints: gazePoints.value })
+  // console.log(gazePoints.value)
+  emit('stop', { gazePoints: gazePoints.value, readingText: formattedText(props.readingText) })
 }
 </script>

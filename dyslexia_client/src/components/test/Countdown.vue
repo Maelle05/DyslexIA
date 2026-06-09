@@ -14,7 +14,7 @@ const count = ref(3)
 onMounted(() => {
   const interval = setInterval(() => {
     count.value--
-    if (count.value < 0) {
+    if (count.value == 0) {
       clearInterval(interval)
       setTimeout(() => emit('done'), 500)
     }

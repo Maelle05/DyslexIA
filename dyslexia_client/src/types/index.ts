@@ -13,7 +13,8 @@ export interface GazePoint {
 }
 
 export interface SessionData {
-  gazePoints: GazePoint[]
+  gazePoints: GazePoint[],
+  readingText?: string 
 }
 
 export interface CalibrationData {
