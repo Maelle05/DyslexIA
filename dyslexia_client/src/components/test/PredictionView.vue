@@ -21,9 +21,12 @@
         <p>{{ result.Prediction === 0 ? 'Non dyslexique' : 'Dyslexique' }} à {{ Math.round(result.Probability * 100) }}%</p>
       </div>
 
-      <RouterLink to="/results"
+      <!-- <RouterLink to="/results"
         class="inline-block border rounded-full px-6 py-2 hover:bg-gray-50 transition"
-        >Voir le rapport</RouterLink>
+        >Voir le rapport</RouterLink> -->
+      <GazeXYChart />
+      <GazeChart />
+
       <br>
       <button @click="downloadCSV" class="rounded-lg border px-5 py-2 transition hover:bg-red-50 active:scale-95 cursor-pointer">Télécharger les données de suivi oculaire</button>
     </div>
@@ -34,6 +37,9 @@
 import { ref, onMounted } from 'vue'
 import { useSessionStore } from '@/stores/session'
 import type { SessionData } from '@/types/index'
+import GazeChart   from '@/components/chart/GazeChart.vue'
+import GazeXYChart   from '@/components/chart/GazeXYChart.vue'
+
 const store = useSessionStore()
 
 const status = ref<'sending' | 'done' | 'error'>('sending')

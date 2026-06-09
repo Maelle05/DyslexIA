@@ -13,7 +13,9 @@
     "gsap": "^3.15.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.34",
-    "vue-router": "^5.1.0"
+    "vue-router": "^5.1.0",
+    "chart.js": "^11.6.0",
+    "vue-chartjs": "^11.6.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",
