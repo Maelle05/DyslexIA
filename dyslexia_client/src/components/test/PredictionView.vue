@@ -24,6 +24,12 @@
       <!-- <RouterLink to="/results"
         class="inline-block border rounded-full px-6 py-2 hover:bg-gray-50 transition"
         >Voir le rapport</RouterLink> -->
+      <GazeHeatmap
+        v-if="store.data"
+        :text="store.data.readingText ?? ''"
+        :gaze-points="store.data.gazePoints"
+        class="mt-8"
+      />
       <GazeXYChart />
       <GazeChart />
 
@@ -39,6 +45,7 @@ import { useSessionStore } from '@/stores/session'
 import type { SessionData } from '@/types/index'
 import GazeChart   from '@/components/chart/GazeChart.vue'
 import GazeXYChart   from '@/components/chart/GazeXYChart.vue'
+import GazeHeatmap from '@/components/chart/GazeHeatmap.vue'
 
 const store = useSessionStore()
 
