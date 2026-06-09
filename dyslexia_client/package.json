@@ -14,8 +14,8 @@
     "pinia": "^3.0.4",
     "vue": "^3.5.34",
     "vue-router": "^5.1.0",
-    "chart.js": "^11.6.0",
-    "vue-chartjs": "^11.6.0"
+    "vue-chartjs": "^5.3.2",
+    "chart.js": "^4.5.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",

@@ -24,20 +24,15 @@ import { Line } from 'vue-chartjs'
 
 const options = {
   responsive: true,
-  interaction: {
-    mode: null
-  },
+  events: [],
   plugins: {
     tooltip: {
-      enabled: false
+      enabled: false,
     },
     legend: {
-      display: true
-    }
+      display: false,
+    },
   },
-  hover: {
-    mode: null
-  }
 }
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend)
