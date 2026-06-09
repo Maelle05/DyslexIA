@@ -4,6 +4,7 @@
     <p v-if="!mediapipeReady" class="text-orange-500" >⏳ Chargement du modèle IA…</p>
     <p v-if="error" class="text-red-500 mt-2">{{ error }}</p>
     <p v-if="ready" class="text-green-600 mt-2">Caméra détectée ✓</p>
+    <p v-if="ready" class="mt-2">Après cette étape, veillez à bouger la tête le moins possible.</p>
     <button v-if="ready" :disabled="!ready || !mediapipeReady" @click="emit('next')"
       class="mt-6 rounded-full px-5 py-2 border transition cursor-pointer hover:bg-gray-50"
     >
