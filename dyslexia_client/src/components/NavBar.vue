@@ -28,6 +28,6 @@
 const links = [
   { href: '/', label: 'Présentation' },
   { href: '/test', label: 'Test' },
-  { href: '/results', label: 'Résultats' },
+  // { href: '/results', label: 'Résultats' },
 ]
 </script>
