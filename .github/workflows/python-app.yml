@@ -34,8 +34,7 @@ jobs:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 dyslexia --max-line-length=250
-        flake8 dyslexia-app --max-line-length=250
+        flake8 dyslexia_api --max-line-length=250
     - name: Test with pytest
       run: |
         pytest tests/*
