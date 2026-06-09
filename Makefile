@@ -1,7 +1,9 @@
 install:
+	@npm --prefix ./dyslexia_client install
 	@pip install .
 
 install-dev:
+	@npm --prefix ./dyslexia_client install
 	@pip install -e . -r requirements.txt
 
 test:
