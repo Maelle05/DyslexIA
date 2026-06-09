@@ -94,6 +94,7 @@ def generate_text():
         "text": text
     }
 
+
 @app.get('/text-question')
 def get_text_question():
     result = get_passage()

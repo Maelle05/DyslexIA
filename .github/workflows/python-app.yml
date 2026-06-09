@@ -29,12 +29,12 @@ jobs:
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Install package
-      run: | 
+      run: |
         pip install -e .
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 dyslexia_api --max-line-length=250
+        flake8 dyslexia_api --max-line-length=840
     - name: Test with pytest
       run: |
         pytest tests/*

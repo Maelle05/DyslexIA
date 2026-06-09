@@ -21,7 +21,6 @@ QUESTIONS = [
 ]
 
 
-
 def get_passage():
     idx = random.randint(0, len(PASSAGES) - 1)
 
