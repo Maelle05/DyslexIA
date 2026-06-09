@@ -9,7 +9,7 @@ test:
 	tests/*
 
 run_api:
-	@uvicorn dyslexia.api.app:app
+	@uvicorn dyslexia_api.api.app:app
 
-run_app:
-	@streamlit run dyslexia-app/app.py
+run_client:
+	@npm --prefix ./dyslexia_client run dev
