@@ -10,3 +10,4 @@ pyautogui
 uvicorn
 python-multipart
 pytest
+httpx2
