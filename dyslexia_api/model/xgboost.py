@@ -1,3 +1,5 @@
+"""Build, save, load, and evaluate XGBoost models for dyslexia detection."""
+
 import xgboost as xgb
 from sklearn.metrics import accuracy_score
 

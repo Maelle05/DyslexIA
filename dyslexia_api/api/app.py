@@ -71,9 +71,7 @@ def predict(csv_file: Annotated[bytes, File()]):
             dtype=None,
             encoding='utf-8'
         )
-    print(pd.DataFrame(array_data).shape)
     X = process_data(pd.DataFrame(array_data))
-    print(X.reshape(1, -1).shape)
 
     model = XGBoostModel.from_file("dyslexia_api/model/xgboost_dyslexia_model_v2.json")
 

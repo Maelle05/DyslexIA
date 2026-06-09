@@ -9,3 +9,4 @@ scipy
 pyautogui
 uvicorn
 python-multipart
+pytest
