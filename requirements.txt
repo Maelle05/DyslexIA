@@ -3,9 +3,7 @@ pandas
 fastapi
 scikit-learn
 xgboost
-streamlit
 opencv-python
 mediapipe==0.10.21
 scipy
 pyautogui
-httpx2

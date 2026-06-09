@@ -4,9 +4,9 @@ from io import BytesIO
 import numpy as np
 from fastapi import FastAPI, File
 import pandas as pd
-from dyslexia.model.xgboost import XGBoostModel
-from dyslexia.processing.text_generation import generate_passage
-from dyslexia.processing.process_v2 import process_data
+from dyslexia_api.model.xgboost import XGBoostModel
+from dyslexia_api.processing.text_generation import generate_passage
+from dyslexia_api.processing.process_v2 import process_data
 from fastapi.middleware.cors import CORSMiddleware
 
 OPTIMAL_THRESHOLD = 0.35
@@ -73,7 +73,7 @@ def predict(csv_file: Annotated[bytes, File()]):
     X = process_data(pd.DataFrame(array_data))
     print(X.reshape(1, -1).shape)
 
-    model = XGBoostModel.from_file("dyslexia/model/xgboost_dyslexia_model_v2.json")
+    model = XGBoostModel.from_file("dyslexia_api/model/xgboost_dyslexia_model_v2.json")
 
     prediction_proba = model.predict_proba(X.reshape(1, -1))
     prediction = int(prediction_proba[0][-1] >= OPTIMAL_THRESHOLD)
