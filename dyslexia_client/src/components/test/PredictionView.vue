@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useSessionStore } from '@/stores/session'
-import type { SessionData } from '@/types'
+import type { SessionData } from '@/types/index'
 const store = useSessionStore()
 
 const status = ref<'sending' | 'done' | 'error'>('sending')

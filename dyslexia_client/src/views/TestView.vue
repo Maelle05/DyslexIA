@@ -47,7 +47,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
 import { useSessionStore } from '@/stores/session'
-import type { TestStep, SessionData, CalibrationData} from '@/types'
+import type { TestStep, SessionData, CalibrationData} from '@/types/index'
 const calibData = ref<CalibrationData | null>(null)
 import CameraDetect   from '@/components/test/CameraDetect.vue'
 import Calibration    from '@/components/test/Calibration.vue'

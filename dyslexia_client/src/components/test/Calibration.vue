@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import type { CalibrationData } from '@/types'
+import type { CalibrationData } from '@/types/index'
 import {
   BASE_R,
   centroid,

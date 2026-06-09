@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { SessionData } from '@/types'
+import type { SessionData } from '@/types/index'
 
 export const useSessionStore = defineStore('session', {
   state: () => ({

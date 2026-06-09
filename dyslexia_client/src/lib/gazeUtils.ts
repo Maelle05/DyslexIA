@@ -1,4 +1,4 @@
-import type { CalibrationData } from '@/types'
+import type { CalibrationData } from '@/types/index'
 
 export const NOSE_INDICES = [1, 2, 4, 5, 6, 19, 20, 94, 125, 141, 235, 281, 354, 370, 460]
 export const BASE_R = 20

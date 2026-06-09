@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import type { GazePoint, SessionData, CalibrationData } from '@/types'
+import type { GazePoint, SessionData, CalibrationData } from '@/types/index'
 import {
   centroid,
   computeScale,
