@@ -24,6 +24,8 @@
       <RouterLink to="/results"
         class="inline-block border rounded-full px-6 py-2 hover:bg-gray-50 transition"
         >Voir le rapport</RouterLink>
+      <br>
+      <button @click="downloadCSV" class="rounded-lg border px-5 py-2 transition hover:bg-red-50 active:scale-95 cursor-pointer">Télécharger les données de suivi oculaire</button>
     </div>
   </div>
 </template>
@@ -48,6 +50,29 @@ function buildCsv(session: SessionData): string {
   return [header, ...rows].join('\n')
 }
 
+function downloadCSV() {
+  if (!store.data) {
+    errorMsg.value = 'Aucune session disponible.'
+    status.value = 'error'
+    return
+  }
+
+  const csv = buildCsv(store.data)
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', 'gaze_data.csv')
+
+  document.body.appendChild(link)
+  link.click()
+
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
 async function send() {
   if (!store.data) {
     errorMsg.value = 'Aucune session disponible.'
@@ -62,7 +87,7 @@ async function send() {
     const blob = new Blob([csv], { type: 'text/csv' })
     const formData = new FormData()
     formData.append('csv_file', blob, 'gaze_log.csv')
-    console.log(csv)
+    // console.log(csv)
 
     const response = await fetch(`${import.meta.env.VITE_API_URL}/predict`, {
       method: 'POST',
