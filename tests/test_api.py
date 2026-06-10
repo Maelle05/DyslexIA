@@ -14,7 +14,7 @@ def test_index_endpoint():
     response = client.get("/")
 
     assert response.status_code == 200
-    assert response.json() == {"app_link": "placeholder for app link"}
+    assert response.json() == {"welcome": "Welcome to DyslexIA API Server"}
 
 
 def test_healthcheck_endpoint():

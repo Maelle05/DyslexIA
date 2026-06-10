@@ -29,10 +29,10 @@ app.add_middleware(
 
 @app.get('/')
 def index():
-    """Return a placeholder link to the front-end application.
+    """Return a welcome message.
 
     Returns:
-        JSON with an ``app_link`` key.
+        JSON with an ``welcome`` key.
     """
     return {"welcome": "Welcome to DyslexIA API Server"}
 
