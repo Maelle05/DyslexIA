@@ -186,7 +186,7 @@ dyslexIA/
 ### Format CSV attendu par `/predict`
 
 ```
-time,angle1_l,angle2_l,angle1_r,angle2_r
+time,x_left,y_left,x_right,y_right
 25,0.85,1.03,-0.88,1.00
 43,0.89,1.23,-0.56,1.34
 ...

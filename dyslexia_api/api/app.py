@@ -34,7 +34,7 @@ def index():
     Returns:
         JSON with an ``app_link`` key.
     """
-    return {"app_link": "placeholder for app link"}
+    return {"welcome": "Welcome to DyslexIA API Server"}
 
 
 @app.get('/healthcheck')
