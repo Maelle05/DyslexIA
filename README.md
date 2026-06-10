@@ -217,6 +217,9 @@ This application is an experiment and can't replace the diagnostic of a professi
 
 - Nilsson Benfatto M, Öqvist Seimyr G, Ygge J, Pansell T, Rydberg A, Jacobson C. Screening for Dyslexia Using Eye Tracking during Reading. PLoS One. 2016 Dec 9;11(12):e0165508. doi: 10.1371/journal.pone.0165508. PMID: 27936148; PMCID: PMC5147795.
 
+### Eye-tracking computations
+- https://github.com/JEOresearch/EyeTracker/tree/main/Webcam3DTracker
+
 ### Made by:
 - Maëlle, Justine, Manon et Yoann
 - Le Wagon Nantes #Batch-2275
