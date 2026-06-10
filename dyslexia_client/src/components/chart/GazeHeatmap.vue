@@ -1,5 +1,5 @@
 <template>
-  <div class="text-left bg-white rounded-xl p-5">
+  <div class="text-left bg-white p-5 shadow">
     <h3 class="font-semibold mb-4 text-center">Heatmap de lecture</h3>
 
     <div

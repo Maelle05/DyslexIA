@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white p-4 rounded-lg shadow">
+  <div class="bg-white p-4 shadow">
     <h3 class="font-semibold mb-4">Relation X / Y (regard)</h3>
 
     <Scatter v-if="dataPoints.length" :data="chartData" :options="options"/>
@@ -49,8 +49,8 @@ const chartData = computed(() => ({
         x: p.yaw_l,
         y: p.pitch_l
       })),
-      borderColor: '#9966FF',
-      backgroundColor: '#9966FF',
+      borderColor: '#6E9960',
+      backgroundColor: '#6E9960',
       showLine: true,
       pointRadius: 1.5,
     },
@@ -60,8 +60,8 @@ const chartData = computed(() => ({
         x: p.yaw_r,
         y: p.pitch_r
       })),
-      borderColor: '#4BC0C0',
-      backgroundColor: '#4BC0C0',
+      borderColor: '#E86A64',
+      backgroundColor: '#E86A64',
       showLine: true,
       pointRadius: 1.5,
     }

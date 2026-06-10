@@ -1,19 +1,49 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@200..800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-display: 'DM Serif Display', serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-display: "Anton", sans-serif;
+  --font-body: "Manrope", sans-serif;
+}
+
+html {
+    overscroll-behavior-y: none;
 }
 
 body {
   font-family: var(--font-body);
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.897);
-}
-
 .font-display {
   font-family: var(--font-display);
+}
+
+.cahier {
+  overflow: hidden;
+  /* Lignes horizontales */
+  background-image:
+    /* Marge rouge verticale */
+    linear-gradient(
+      to right,
+      transparent 150px,
+      rgba(220,60,60,0.45) 150px,
+      rgba(220,60,60,0.45) 153px,
+      transparent 153px
+    ),
+    /* Lignes bleues répétées */
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 31px,
+      #CDC7B9 31px,
+      #CDC7B9 32px
+    ),
+    repeating-linear-gradient(
+      to right,
+      transparent 0px,
+      transparent 50px,
+      #CDC7B9 50px,
+      #CDC7B9 51px
+    );
+  background-size: 100% 100%;
 }
