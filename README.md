@@ -204,6 +204,9 @@ time,x_left,y_left,x_right,y_right
 }
 ```
 
+## Research and Development of the model
+R&D notebooks are availble in the main branch.
+
 ## Disclaimer
 This app was made for french users as a first experiment so the prediction output, text and question generation are in french right now.
 
