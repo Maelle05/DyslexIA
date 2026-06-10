@@ -61,7 +61,7 @@ const features = [
     Parmi l'ensemble des personnes ayant des difficultés à lire, écrire, parler et orthographier, environ 70 à 80 % souffrent d'un certain degré de dyslexie. La dyslexie est généralement définie comme un spectre de difficultés.
     Les méthodes actuelles de dépistage de la dyslexie reposent sur une série de tests de lecture, d'écriture et d'expression orale.
     L'inconvénient de ce système de tests est qu'ils sont assez coûteux et ne sont pas disponibles partout.`,
-    img: 'imgs/humans-3.png',
+    img: '/imgs/humans-3.png',
     color: '#299F9C'
   },
   {
@@ -69,29 +69,29 @@ const features = [
     color: '#E86A64',
     desc: 'Analyse saccades, fixations et temp de lecture',
     text: "DyslexIA est une application capable d'utiliser les données d'oculométrie d'une personne lisant un texte devant sa webcam pour déterminer si cette personne est dyslexique ou non. \n \n Les données d'oculométrie (angles yaw/pitch de chaque iris) sont collectées à l'aide de MediaPipe FaceLandmarker.",
-    img: 'imgs/humans-2.png'
+    img: '/imgs/humans-2.png'
   },
   { title: 'IA Prédiction',
     color: '#6E9960',
     desc: 'Modèle entraîné sur patterns oculaires cliniques',
-    img: 'imgs/humans-4.png'
+    img: '/imgs/humans-4.png'
   },
   { title: 'Rapport Détaillé',
     color: '#299F9C',
     desc: 'fixations, régressions, score global, prediction',
-    img: 'imgs/humans-1.png'
+    img: '/imgs/humans-1.png'
   },
   {
     title: 'Disclaimer',
     color: '#E86A64',
     text: "Cette application a été conçue à titre expérimental pour les utilisateurs francophones ; par conséquent, les résultats des prédictions, ainsi que la génération de texte et de questions, sont pour l'instant en français. \n L'eye-tracking donnera de meilleurs résultats avec des webcams de haute qualité et un bon éclairage. \n Cette application est une expérience et ne peut en aucun cas se substituer au diagnostic d'un professionnel. Si vous avez le moindre doute quant à une éventuelle dyslexie chez vous ou chez quelqu'un d'autre, nous vous recommandons de consulter un professionnel.",
-    img: 'imgs/humans-5.png'
+    img: '/imgs/humans-5.png'
   },
   { title: 'Crédits',
     color: '#6E9960',
     desc: 'Justine Boulant \n Yoann Lemoine \n Maëlle Rabouan \n Manon Hell',
     text: 'Le Wagon Nantes #Batch-2275',
-    img: 'imgs/humans-6.png'
+    img: '/imgs/humans-6.png'
   },
 ]
 
