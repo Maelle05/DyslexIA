@@ -1,6 +1,6 @@
 <template>
   <div
-      class="fixed inset-0 z-[9999] flex items-center justify-center bg-white p-8 text-center lg:hidden"
+      class="fixed inset-0 z-[9999] flex items-center justify-center bg-[#E9E4DB] p-8 text-center lg:hidden"
     >
     <div>
       <h1 class="font-display text-black-900 text-5xl font-bold">DyslexIA</h1>
@@ -16,7 +16,7 @@
     </div>
   </div>
 
-  <div class="min-h-screen relative overflow-x-hidden bg-[#dde6ed]">
+  <div class="min-h-screen relative overflow-x-hidden bg-[#E9E4DB] cahier">
 
     <NavBar />
 
