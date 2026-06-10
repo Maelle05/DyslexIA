@@ -1,22 +1,32 @@
 <template>
   <div class="max-w-6xl mx-auto text-center px-4 py-8">
-    <h2 class="text-2xl font-semibold mb-10">Lecture en cours</h2>
+    <h2 class="text-3xl font-semibold mb-10 font-display">Lecture en cours</h2>
 
     <!-- Même rendu que GazeHeatmap -->
-    <div class="text-lg text-left leading-loose max-w-3xl mx-auto mb-8"
-         style="word-break: normal; overflow-wrap: break-word;">
-      <template v-for="(token, i) in words" :key="i">
-        <br v-if="token === '\n'" />
-        <span v-else :data-word="token" class="inline-block">{{ token }}&nbsp;</span>
-      </template>
-    </div>
+     <div class="bg-white p-5 shadow">
+        <div class="text-lg text-left leading-loose max-w-3xl mx-auto max-w-3xl mx-auto"
+            style="word-break: normal; overflow-wrap: break-word;">
+          <template v-for="(token, i) in words" :key="i">
+            <br v-if="token === '\n'" />
+            <span v-else :data-word="token" class="inline-block">{{ token }}&nbsp;</span>
+          </template>
+        </div>
+     </div>
 
-    <button
-      class="mt-6 rounded-full px-5 py-2 border transition cursor-pointer hover:bg-gray-50"
-      @click="stop"
-    >
-      ⏹ Arrêter et analyser
-    </button>
+    <div class="rotate-[2deg] hover:scale-105 hover:-rotate-[3deg] transition-transform duration-300 inline-block">
+      <button
+        class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
+                  before:absolute before:bottom-[0px] before:left-0
+                  before:h-[100%] before:w-full
+                  before:bg-[#299F9C] before:[-z-index:1]
+                  before:scale-x-0 before:origin-left
+                  before:transition-transform before:duration-300
+                  hover:before:scale-x-100"
+        @click="stop"
+      >
+        <span class="relative z-10 cursor-pointer">⏹ Arrêter et analyser</span>
+      </button>
+    </div>
     <p class="mt-6 text-sm text-gray-600">⏱ {{ elapsed }}s — {{ gazePoints.length }} points enregistrés</p>
   </div>
 </template>

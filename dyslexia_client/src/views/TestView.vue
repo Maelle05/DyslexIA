@@ -4,14 +4,14 @@
 
     <!-- Preview caméra toujours visible -->
     <div
-    class="fixed z-50 transition-all duration-1000"
+    class="fixed z-50 transition-all duration-1000 bg-[#E9E4DB]"
     :class="step === 'camera'
-        ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-0/2'
+        ? 'bottom-4 right-4'
         : 'bottom-4 right-4'"
     >
       <video ref="videoRef" autoplay playsinline muted
         class="rounded-lg border shadow-lg transition-all duration-1000 shadow-xl ring-2 ring-black/10"
-        :class="step === 'camera'
+        :class="(step === 'camera' || step === 'calibration')
           ? 'h-[340px] w-[453px]'
           : 'h-[120px] w-[160px]'"
         />

@@ -17,7 +17,7 @@
     <div v-else-if="status === 'done' && result !== null" class="space-y-6">
       <p class="text-green-600 font-medium" >✅ Analyse terminée</p>
 
-      <div class="mt-10 text-xl bg-gray-50 p-4 rounded-lg overflow-auto font-semibold">
+      <div class="mt-10 text-xl bg-gray-50 p-4 overflow-auto font-semibold shadow">
         <p>{{ result.Prediction === 0 ? 'Non dyslexique' : 'Dyslexique' }} à {{ Math.round(result.Probability * 100) }}%</p>
       </div>
 
@@ -34,7 +34,17 @@
       <GazeChart />
 
       <br>
-      <button @click="downloadCSV" class="rounded-lg border px-5 py-2 transition hover:bg-red-50 active:scale-95 cursor-pointer">Télécharger les données de suivi oculaire</button>
+
+      <div class="rotate-[2deg] hover:scale-105 hover:-rotate-[3deg] transition-transform duration-300 inline-block">
+      <button @click="downloadCSV" class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
+                    before:absolute before:bottom-[0px] before:left-0
+                    before:h-[100%] before:w-full
+                    before:bg-[#299F9C] before:[-z-index:1]
+                    before:scale-x-0 before:origin-left
+                    before:transition-transform before:duration-300
+                    hover:before:scale-x-100"
+                    > <span class="relative z-10 cursor-pointer"> Télécharger les données de suivi oculaire </span></button>
+                    </div>
     </div>
   </div>
 </template>

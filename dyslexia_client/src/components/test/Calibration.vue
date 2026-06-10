@@ -1,33 +1,41 @@
 <template>
   <div class="max-w-md mx-auto text-center px-4 py-8">
-    <h2 class="text-2xl font-semibold mb-10">Calibration</h2>
+    <h2 class="text-3xl font-semibold mb-5 font-display">Calibration</h2>
 
-    <p v-if="!faceLocked" class="text-amber-600 text-sm bg-amber-50 px-4 py-2 rounded-full inline-block mb-6">
+    <p v-if="!faceLocked" class="text-[#E86A64] bg-white inline-block px-4 py-2 mt-2">
       ⚠ Aucun visage détecté
     </p>
-    <p v-else-if="calibStep === 'lock'" class="text-emerald-600 text-sm bg-emerald-50 px-4 py-2 rounded-full inline-block mb-6">
+    <p v-else-if="calibStep === 'lock'" class="text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">
       ✓ Visage détecté
     </p>
 
     <!-- Étape 1 : lock des sphères oculaires -->
-    <div v-if="calibStep === 'lock' && faceLocked">
+    <div v-if="calibStep === 'lock' && faceLocked" class="mt-10">
       <p class="mb-6">Regardez le point rouge et cliquez dessus</p>
       <button
-        class="border w-10 h-10 bg-red-100 border-red-600 rounded-full hover:bg-red-600 cursor-pointer"
+        class="border w-10 h-10 bg-red-300 border-red-600 rounded-full hover:bg-red-600 cursor-pointer"
         @click="lockSpheres"
       />
     </div>
 
     <!-- Étape done -->
     <div v-else-if="calibStep === 'done'">
-      <p class="text-emerald-600 text-sm bg-emerald-50 px-4 py-2 rounded-full inline-block mb-6">✓ Calibration complète</p>
+      <p class="text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">✓ Calibration complète</p>
       <br />
-      <button
-        class="mt-6 rounded-full px-5 py-2 border transition cursor-pointer hover:bg-gray-50"
-        @click="emit('next', calibData!)"
-      >
-        Continuer
-      </button>
+      <div class="rotate-[2deg] hover:scale-105 hover:-rotate-[5deg] transition-transform duration-300 inline-block">
+        <button
+          class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
+                   before:absolute before:bottom-[0px] before:left-0
+                   before:h-[100%] before:w-full
+                   before:bg-[#299F9C] before:[-z-index:1]
+                   before:scale-x-0 before:origin-left
+                   before:transition-transform before:duration-300
+                   hover:before:scale-x-100"
+          @click="emit('next', calibData!)"
+        >
+          <span class="relative z-10 cursor-pointer">Continuer</span>
+        </button>
+      </div>
     </div>
   </div>
 </template>

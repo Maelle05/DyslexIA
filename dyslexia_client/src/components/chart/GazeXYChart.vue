@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white p-4 rounded-lg shadow">
+  <div class="bg-white p-4 shadow">
     <h3 class="font-semibold mb-4">Relation X / Y (regard)</h3>
 
     <Scatter v-if="dataPoints.length" :data="chartData" :options="options"/>

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white p-4 rounded-lg shadow">
+  <div class="bg-white p-4 shadow">
     <h3 class="font-semibold mb-4">Suivi du regard</h3>
 
     <Line v-if="chartData.length" :data="data" :options="options"/>

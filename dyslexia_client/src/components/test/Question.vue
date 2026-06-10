@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-[700px] mx-auto text-center px-4 py-8">
-    <h2 class="text-2xl font-semibold mb-10">Question</h2>
+    <h2 class="text-3xl font-semibold mb-4 font-display">Question</h2>
 
     <p class="mb-8 text-lg">{{ questionText }}</p>
 
@@ -9,10 +9,10 @@
         v-for="(answer, index) in [a1Text, a2Text, a3Text]"
         :key="index"
         :class="[
-          'px-5 py-3 bg-gray-50 rounded-full border transition cursor-pointer text-left',
+          'px-5 py-3 transition cursor-pointer text-left shadow active:scale-95',
           selected === index
-            ? 'border-gray-400 text-gray-800'
-            : 'hover:bg-gray-200 border-gray-200'
+            ? 'bg-[#299F9CE6]'
+            : 'bg-white hover:bg-[#299F9CE6]'
         ]"
         @click="selectedAnswer(index)"
       >
@@ -22,36 +22,61 @@
 
     <!-- Résultat après validation -->
     <div v-if="validated" class="mb-6">
-      <p v-if="selected === aText" class="text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full inline-block">
+      <p v-if="selected === aText" class="text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">
         ✓ Bonne réponse !
       </p>
-      <p v-else class="text-red-500 bg-red-50 px-4 py-2 rounded-full inline-block">
+      <p v-else class="text-[#E86A64] bg-white inline-block px-4 py-2 mt-2">
         ✗ Mauvaise réponse... la bonne réponse était : {{ [a1Text, a2Text, a3Text][aText] }}.
       </p>
     </div>
 
-    <button v-if="!validated"
-      class="mt-2 rounded-full px-5 py-2 border transition cursor-pointer hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-      :disabled="selected === null"
-      @click="validate"
-    >
-      Valider
-    </button>
+    <div v-if="!validated" class="rotate-[2deg] hover:scale-105 hover:-rotate-[5deg] transition-transform duration-300 inline-block">
+      <button
+        class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
+                    before:absolute before:bottom-[0px] before:left-0
+                    before:h-[100%] before:w-full
+                    before:bg-[#299F9C] before:[-z-index:1]
+                    before:scale-x-0 before:origin-left
+                    before:transition-transform before:duration-300
+                    hover:before:scale-x-100"
+        :disabled="selected === null"
+        @click="validate"
+      >
+        <span class="relative z-10 cursor-pointer">Valider</span>
+      </button>
+    </div>
 
-    <button v-if="validated && selected === aText"
-      class="mt-2 rounded-full px-5 py-2 border transition cursor-pointer hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-      :disabled="selected === null"
-      @click="validate"
-    >
-      Continuer
-    </button>
-    <button v-if="validated && selected != aText"
-      class="mt-2 rounded-full px-5 py-2 border transition cursor-pointer hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-      :disabled="selected === null"
-      @click="returnRead"
-    >
-      Recomencer
-    </button>
+    <div v-if="validated && selected === aText" class="rotate-[2deg] hover:scale-105 hover:-rotate-[5deg] transition-transform duration-300 inline-block">
+      <button
+        class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
+                   before:absolute before:bottom-[0px] before:left-0
+                   before:h-[100%] before:w-full
+                   before:bg-[#299F9C] before:[-z-index:1]
+                   before:scale-x-0 before:origin-left
+                   before:transition-transform before:duration-300
+                   hover:before:scale-x-100"
+        :disabled="selected === null"
+        @click="validate"
+      >
+        <span class="relative z-10 cursor-pointer">Continuer</span>
+      </button>
+    </div>
+
+    <div v-if="validated && selected != aText" class="rotate-[2deg] hover:scale-105 hover:-rotate-[5deg] transition-transform duration-300 inline-block">
+      <button
+        class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
+                   before:absolute before:bottom-[0px] before:left-0
+                   before:h-[100%] before:w-full
+                   before:bg-[#299F9C] before:[-z-index:1]
+                   before:scale-x-0 before:origin-left
+                   before:transition-transform before:duration-300
+                   hover:before:scale-x-100"
+        :disabled="selected === null"
+        @click="returnRead"
+      >
+        <span class="relative z-10 cursor-pointer">Recomencer</span>
+      </button>
+    </div>
   </div>
 </template>
 
