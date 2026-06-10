@@ -30,11 +30,6 @@ def load_dataset1(filepath):
 
     df['t_s'] = (df['time'] - df['time'].iloc[0]) / 1e6   # µs → secondes relatives
 
-    # Blinks : coordonnées à 0
-    valid = (df['gaze_x_left'] > 0) & (df['gaze_y_left'] > 0) & \
-            (df['gaze_x_right'] > 0) & (df['gaze_y_right'] > 0)
-    df = df[valid].copy()
-
     df['x'] = (df['gaze_x_left']  + df['gaze_x_right'])  / 2
     df['y'] = (df['gaze_y_left']  + df['gaze_y_right'])  / 2
     df['x_left'] = df['gaze_x_left']
@@ -43,8 +38,12 @@ def load_dataset1(filepath):
     df['y_right'] = df['gaze_y_right']
     # df['pupil'] = (df['pupil_left'] + df['pupil_right']) / 2
 
-    return df[['t_s', 'x', 'y', 'x_left', 'y_left', 'x_right', 'y_right']].reset_index(drop=True)
+    df['x_left']  = (df['x_left']  - df['x_left'].min())  / (df['x_left'].max()  - df['x_left'].min())
+    df['y_left']  = (df['y_left']  - df['y_left'].min())  / (df['y_left'].max()  - df['y_left'].min())
+    df['x_right'] = (df['x_right'] - df['x_right'].min()) / (df['x_right'].max() - df['x_right'].min())
+    df['y_right'] = (df['y_right'] - df['y_right'].min()) / (df['y_right'].max() - df['y_right'].min())
 
+    return df[['t_s', 'x', 'y', 'x_left', 'y_left', 'x_right', 'y_right']].reset_index(drop=True)
 
 def load_dataset2(filepath):
     """
@@ -57,9 +56,6 @@ def load_dataset2(filepath):
 
     df['t_s'] = df['T'] / 1000   # ms → secondes
 
-    blink = (df['LX'].abs() < 1) & (df['LY'].abs() < 1)
-    df = df[~blink].copy()
-
     df['x'] = (df['LX'] + df['RX']) / 2
     df['y'] = (df['LY'] + df['RY']) / 2
     df['x_left'] = df['LX']
@@ -68,8 +64,12 @@ def load_dataset2(filepath):
     df['y_right'] = df['RY']
     # df['pupil'] = np.nan   # non disponible dans ce dataset
 
-    return df[['t_s', 'x', 'y', 'x_left', 'y_left', 'x_right', 'y_right']].reset_index(drop=True)
+    df['x_left']  = (df['x_left']  - df['x_left'].min())  / (df['x_left'].max()  - df['x_left'].min())
+    df['y_left']  = (df['y_left']  - df['y_left'].min())  / (df['y_left'].max()  - df['y_left'].min())
+    df['x_right'] = (df['x_right'] - df['x_right'].min()) / (df['x_right'].max() - df['x_right'].min())
+    df['y_right'] = (df['y_right'] - df['y_right'].min()) / (df['y_right'].max() - df['y_right'].min())
 
+    return df[['t_s', 'x', 'y', 'x_left', 'y_left', 'x_right', 'y_right']].reset_index(drop=True)
 
 def load_app(filepath):
     """
