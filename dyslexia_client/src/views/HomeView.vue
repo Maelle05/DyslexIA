@@ -23,7 +23,7 @@
       <div
         v-for="(f, i) in features"
         :key="f.title"
-        class="feature-block py-20 px-[100px] flex flex-row justify-between gap-10 border-b border-[#CDC7B9]"
+        class="feature-block py-20 px-[100px] flex flex-row justify-between align-bottom gap-10 border-b border-[#CDC7B9]"
         :class="i % 2 === 0 ? 'mr-auto' : 'ml-auto text-right flex-row-reverse'"
       >
         <div class="max-w-[60vw]">
@@ -32,17 +32,17 @@
             :style="{ backgroundColor: f.color }"
             :class="i % 2 === 0 ? '-rotate-[5deg]' : 'rotate-[3deg]'"
           >{{ f.title }}</h3>
-          <p v-if="f.desc" class="mt-4 text-gray-600 font-bold">{{ f.desc }}</p>
+          <p v-if="f.desc" class="mt-4 text-gray-600 font-bold whitespace-pre-line">{{ f.desc }}</p>
           <p v-if="f.text" class="mt-6 text-gray-600 text-left leading-relaxed whitespace-pre-line">{{ f.text }}</p>
         </div>
         <img
           v-if="f.img"
           :src="f.img"
           :alt="f.title"
-          class="mt-4 w-full max-w-sm rounded-xl object-cover"
-          :class="i % 2 === 0 ? '' : 'ml-auto'"
+          class="w-[300px] h-[350px] object-contain"
         />
       </div>
+      <div>Github</div>
     </section>
   </div>
 </template>
@@ -57,24 +57,42 @@ const features = [
   {
     title: 'Présentation',
     desc: "Qu'est-ce que la dyslexie ?",
-    text: "La dyslexie est un trouble neurologique qui touche environ 5 à 10 % de la population mondiale, soit quelque 700 millions de personnes. \n Il s'agit d'un trouble d'apprentissage lié au langage. Ses symptômes varient d'une personne à l'autre. Elle affecte généralement la manière dont les personnes lisent et écrivent. Parmi l'ensemble des personnes ayant des difficultés à lire, écrire, parler et orthographier, environ 70 à 80 % souffrent d'un certain degré de dyslexie. La dyslexie est généralement définie comme un spectre de difficultés. Les méthodes actuelles de dépistage de la dyslexie reposent sur une série de tests de lecture, d'écriture et d'expression orale. L'inconvénient de ce système de tests est qu'ils sont assez coûteux et ne sont pas disponibles partout.",
-    img: 'imgs/humans-1.png',
+    text: `La dyslexie est un trouble neurologique qui touche environ 5 à 10 % de la population mondiale, soit quelque 700 millions de personnes. Il s'agit d'un trouble d'apprentissage lié au langage. Ses symptômes varient d'une personne à l'autre. Elle affecte généralement la manière dont les personnes lisent et écrivent. \n
+    Parmi l'ensemble des personnes ayant des difficultés à lire, écrire, parler et orthographier, environ 70 à 80 % souffrent d'un certain degré de dyslexie. La dyslexie est généralement définie comme un spectre de difficultés.
+    Les méthodes actuelles de dépistage de la dyslexie reposent sur une série de tests de lecture, d'écriture et d'expression orale.
+    L'inconvénient de ce système de tests est qu'ils sont assez coûteux et ne sont pas disponibles partout.`,
+    img: 'imgs/humans-3.png',
     color: '#299F9C'
   },
   {
-    title: 'Eye-Tracking 👀',
+    title: 'Eye-Tracking',
     color: '#E86A64',
-    desc: 'Analyse saccades et fixations via MediaPipe',
-    text: "DyslexIA est une application capable d'utiliser les données d'oculométrie d'une personne lisant un texte devant sa webcam pour déterminer si cette personne est dyslexique ou non. \n Les données d'oculométrie (angles yaw/pitch de chaque iris) sont collectées à l'aide de MediaPipe FaceLandmarker.",
+    desc: 'Analyse saccades, fixations et temp de lecture',
+    text: "DyslexIA est une application capable d'utiliser les données d'oculométrie d'une personne lisant un texte devant sa webcam pour déterminer si cette personne est dyslexique ou non. \n \n Les données d'oculométrie (angles yaw/pitch de chaque iris) sont collectées à l'aide de MediaPipe FaceLandmarker.",
+    img: 'imgs/humans-2.png'
   },
-  { title: '🤖 IA Prédiction', color: '#6E9960', desc: 'Modèle entraîné sur patterns oculaires cliniques' },
-  { title: 'Rapport Détaillé', color: '#299F9C', desc: 'fixations, régressions, score global, prediction' },
+  { title: 'IA Prédiction',
+    color: '#6E9960',
+    desc: 'Modèle entraîné sur patterns oculaires cliniques',
+    img: 'imgs/humans-4.png'
+  },
+  { title: 'Rapport Détaillé',
+    color: '#299F9C',
+    desc: 'fixations, régressions, score global, prediction',
+    img: 'imgs/humans-1.png'
+  },
   {
     title: 'Disclaimer',
     color: '#E86A64',
-    text: "Cette application a été conçue à titre expérimental pour les utilisateurs francophones ; par conséquent, les résultats des prédictions, ainsi que la génération de texte et de questions, sont pour l'instant en français. \n L'eye-tracking donnera de meilleurs résultats avec des webcams de haute qualité et un bon éclairage. \n Cette application est une expérience et ne peut en aucun cas se substituer au diagnostic d'un professionnel. Si vous avez le moindre doute quant à une éventuelle dyslexie chez vous ou chez quelqu'un d'autre, nous vous recommandons de consulter un professionnel."
+    text: "Cette application a été conçue à titre expérimental pour les utilisateurs francophones ; par conséquent, les résultats des prédictions, ainsi que la génération de texte et de questions, sont pour l'instant en français. \n L'eye-tracking donnera de meilleurs résultats avec des webcams de haute qualité et un bon éclairage. \n Cette application est une expérience et ne peut en aucun cas se substituer au diagnostic d'un professionnel. Si vous avez le moindre doute quant à une éventuelle dyslexie chez vous ou chez quelqu'un d'autre, nous vous recommandons de consulter un professionnel.",
+    img: 'imgs/humans-5.png'
   },
-  { title: 'Crédits', color: '#6E9960', desc: 'Justine Boulant, Yoann Lemoine, Maëlle Rabouan, Manon Hell' },
+  { title: 'Crédits',
+    color: '#6E9960',
+    desc: 'Justine Boulant \n Yoann Lemoine \n Maëlle Rabouan \n Manon Hell',
+    text: 'Le Wagon Nantes #Batch-2275',
+    img: 'imgs/humans-6.png'
+  },
 ]
 
 let ScrollTriggerInstance: any
