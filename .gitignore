@@ -1,7 +1,6 @@
 .env
 /data
 *.csv
-*.png
 .python-version
 /__pycache__/*
 .DS_Store
