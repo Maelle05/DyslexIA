@@ -42,7 +42,16 @@
           class="w-[300px] h-[350px] object-contain"
         />
       </div>
-      <div>Github</div>
+      <div class="w-full flex justify-center py-5">
+        <div class="flex flex-col gap-1 items-center">
+          <a href="https://github.com/Maelle05/DyslexIA" target="_blank" rel="noopener noreferrer" class="h-[50px] w-[50px] inline-block">
+            <img src="https://img.icons8.com/?size=100&id=12599&format=png&color=000000" alt="" srcset="">
+          </a>
+          <div class="py-4 text-center text-sm text-gray-500 z-1">
+            © {{ new Date().getFullYear() }}— All rights reserved
+          </div>
+        </div>
+      </div>
     </section>
   </div>
 </template>
