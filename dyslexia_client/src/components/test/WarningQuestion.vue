@@ -1,8 +1,8 @@
 <template>
-  <div class="max-w-[700px] mx-auto text-center px-4 py-8">
+  <div class="max-w-[700px] mx-auto text-center px-4 pt-2 pb-8">
     <h2 class="text-3xl font-semibold mb-10 font-display">Avertissement</h2>
 
-
+    <div class="h-[calc(100vh-300px)] flex flex-col align-center justify-center">
       <p class="mb-6">
         Après un décompte de 3 secondes, un texte va s'afficher. <br>
         Lisez-le attentivement, une question de compréhension va vous être posée par la suite.
@@ -22,6 +22,7 @@
           <span class="relative z-10 cursor-pointer">J'ai compris</span>
         </button>
       </div>
+    </div>
   </div>
 </template>
 

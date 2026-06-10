@@ -47,16 +47,16 @@ const data = computed(() => ({
     {
       label: 'écart gauche',
       data: chartData.value.map(p => p.yaw_l),
-      borderColor: '#9966FF',
-      backgroundColor: '#9966FF',
+      borderColor: '#6E9960',
+      backgroundColor: '#6E9960',
       tension: 0.3,
       pointRadius: 1.5,
     },
     {
       label: 'écart droite',
       data: chartData.value.map(p => p.yaw_r),
-      borderColor: '#4BC0C0',
-      backgroundColor: '#4BC0C0',
+      borderColor: '#E86A64',
+      backgroundColor: '#E86A64',
       tension: 0.3,
       pointRadius: 1.5,
     }

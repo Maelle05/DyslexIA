@@ -1,9 +1,11 @@
 <template>
-  <div class="max-w-md mx-auto text-center px-4 py-8">
+  <div class="max-w-md mx-auto text-center px-4 pt-2 pb-8">
     <h2 class="text-3xl font-semibold mb-4 font-display" >Vérification de la caméra</h2>
-      <p v-if="!mediapipeReady" class="text-orange-500" >⏳ Chargement du modèle IA…</p>
-      <p v-if="error" class="text-red-500 mt-2">{{ error }}</p>
-      <p v-if="ready" class="text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">Caméra détectée ✓</p>
+
+    <div class="mt-[45vh]">
+      <p v-if="!mediapipeReady" class="text-orange-500 bg-white inline-block px-4 py-2 mt-2" >⏳ Chargement du modèle IA…</p>
+      <p v-if="error" class="text-red-500 text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">{{ error }}</p>
+      <p v-if="ready && mediapipeReady && !error" class="text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">Caméra détectée ✓</p>
       <p v-if="ready" class="mt-7 mb-2">Après cette étape, veillez à bouger la tête le moins possible.</p>
       <div class="rotate-[2deg] hover:scale-105 hover:-rotate-[5deg] transition-transform duration-300 inline-block">
         <button v-if="ready" :disabled="!ready || !mediapipeReady" @click="emit('next')"
@@ -19,6 +21,7 @@
         </button>
       </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">

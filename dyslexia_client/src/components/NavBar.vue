@@ -9,8 +9,8 @@
       <div class="flex gap-6">
         <RouterLink
           v-for="l in links" :key="l.href" :to="l.href"
-          class="text-sm font-light transition-colors duration-200 text-black-700 hover:text-black-900"
-          active-class="text-black-600 font-medium"
+          class="text-sm font-light transition-colors duration-200 text-black hover:text-black-900"
+          active-class="text-black font-medium"
         >
           {{ l.label }}
         </RouterLink>

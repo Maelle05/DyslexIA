@@ -1,23 +1,23 @@
 <template>
-  <div class="max-w-6xl mx-auto text-center px-4 py-8">
-    <h2 class="text-2xl font-semibold mb-8">Analyse</h2>
+  <div class="max-w-6xl mx-auto text-center px-4 pt-2 pb-8">
+    <h2 class="text-3xl font-semibold mb-10 font-display">Analyse</h2>
 
     <!-- Envoi en cours -->
     <div v-if="status === 'sending'" class="text-gray-600">
-      <p>⏳ Envoi des données…</p>
+      <p class="text-orange-500 bg-white inline-block px-4 py-2 mt-2">⏳ Envoi des données…</p>
     </div>
 
     <!-- Erreur -->
     <div v-else-if="status === 'error'" class="text-red-600">
-      <p class="mb-4">{{ errorMsg }}</p>
-      <button @click="send" class="rounded-lg border px-5 py-2 transition hover:bg-red-50 active:scale-95">Réessayer</button>
+      <p class="text-red-500 bg-white inline-block px-4 py-2 mt-2">{{ errorMsg }}</p>
+      <button @click="send" class="bg-white px-5 py-2 transition hover:bg-[#E86A64] active:scale-95">Réessayer</button>
     </div>
 
     <!-- Résultat -->
     <div v-else-if="status === 'done' && result !== null" class="space-y-6">
-      <p class="text-green-600 font-medium" >✅ Analyse terminée</p>
+      <p class="text-green-500 bg-white inline-block px-4 py-2 mt-2 shadow" >✅ Analyse terminée</p>
 
-      <div class="mt-10 text-xl bg-gray-50 p-4 overflow-auto font-semibold shadow">
+      <div class="text-3xl bg-white p-4 overflow-auto font-bold shadow">
         <p>{{ result.Prediction === 0 ? 'Non dyslexique' : 'Dyslexique' }} à {{ Math.round(result.Probability * 100) }}%</p>
       </div>
 
@@ -28,7 +28,7 @@
         v-if="store.data"
         :text="store.data.readingText ?? ''"
         :gaze-points="store.data.gazePoints"
-        class="mt-8"
+        class="mt-4"
       />
       <GazeXYChart />
       <GazeChart />

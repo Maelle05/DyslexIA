@@ -1,7 +1,6 @@
 <template>
-  <div class="max-w-md mx-auto text-center px-4 py-8">
-    <h2 class="text-3xl font-semibold mb-5 font-display">Calibration</h2>
-
+  <div class="max-w-md mx-auto text-center px-4 pt-2 pb-8">
+    <h2 class="text-3xl font-semibold mb-2 font-display">Calibration</h2>
     <p v-if="!faceLocked" class="text-[#E86A64] bg-white inline-block px-4 py-2 mt-2">
       ⚠ Aucun visage détecté
     </p>
@@ -9,32 +8,35 @@
       ✓ Visage détecté
     </p>
 
-    <!-- Étape 1 : lock des sphères oculaires -->
-    <div v-if="calibStep === 'lock' && faceLocked" class="mt-10">
-      <p class="mb-6">Regardez le point rouge et cliquez dessus</p>
-      <button
-        class="border w-10 h-10 bg-red-300 border-red-600 rounded-full hover:bg-red-600 cursor-pointer"
-        @click="lockSpheres"
-      />
-    </div>
+    <div class="h-[calc(100vh-300px)] flex flex-col align-center justify-center">
 
-    <!-- Étape done -->
-    <div v-else-if="calibStep === 'done'">
-      <p class="text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">✓ Calibration complète</p>
-      <br />
-      <div class="rotate-[2deg] hover:scale-105 hover:-rotate-[5deg] transition-transform duration-300 inline-block">
+      <!-- Étape 1 : lock des sphères oculaires -->
+      <div v-if="calibStep === 'lock' && faceLocked" class="mt-10">
         <button
-          class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
-                   before:absolute before:bottom-[0px] before:left-0
-                   before:h-[100%] before:w-full
-                   before:bg-[#299F9C] before:[-z-index:1]
-                   before:scale-x-0 before:origin-left
-                   before:transition-transform before:duration-300
-                   hover:before:scale-x-100"
-          @click="emit('next', calibData!)"
-        >
-          <span class="relative z-10 cursor-pointer">Continuer</span>
-        </button>
+        class="border w-10 h-10 bg-red-300 border-red-600 rounded-full hover:bg-red-600 cursor-pointer mb-6"
+        @click="lockSpheres"
+        />
+        <p class="">Regardez et cliquez sur le point rouge</p>
+      </div>
+
+      <!-- Étape done -->
+      <div v-else-if="calibStep === 'done'">
+        <p class="text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">✓ Calibration complète</p>
+        <br />
+        <div class="rotate-[2deg] hover:scale-105 hover:-rotate-[5deg] transition-transform duration-300 inline-block">
+          <button
+            class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
+                    before:absolute before:bottom-[0px] before:left-0
+                    before:h-[100%] before:w-full
+                    before:bg-[#299F9C] before:[-z-index:1]
+                    before:scale-x-0 before:origin-left
+                    before:transition-transform before:duration-300
+                    hover:before:scale-x-100"
+            @click="emit('next', calibData!)"
+          >
+            <span class="relative z-10 cursor-pointer">Continuer</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

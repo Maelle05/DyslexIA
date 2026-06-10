@@ -1,33 +1,34 @@
 <template>
-  <div class="max-w-6xl mx-auto text-center px-4 py-8">
-    <h2 class="text-3xl font-semibold mb-10 font-display">Lecture en cours</h2>
+  <div class="max-w-6xl mx-auto text-center px-4 pt-2">
+    <h2 class="text-3xl font-semibold font-display">Lecture en cours</h2>
+    <div class="h-[calc(100vh-134px)] flex flex-col align-center justify-center">
+      <!-- Même rendu que GazeHeatmap -->
+      <div class="bg-white p-5 shadow z-99">
+          <div class="text-lg text-left leading-loose max-w-3xl mx-auto max-w-3xl mx-auto"
+              style="word-break: normal; overflow-wrap: break-word;">
+            <template v-for="(token, i) in words" :key="i">
+              <br v-if="token === '\n'" />
+              <span v-else :data-word="token" class="inline-block">{{ token }}&nbsp;</span>
+            </template>
+          </div>
+      </div>
 
-    <!-- Même rendu que GazeHeatmap -->
-     <div class="bg-white p-5 shadow">
-        <div class="text-lg text-left leading-loose max-w-3xl mx-auto max-w-3xl mx-auto"
-            style="word-break: normal; overflow-wrap: break-word;">
-          <template v-for="(token, i) in words" :key="i">
-            <br v-if="token === '\n'" />
-            <span v-else :data-word="token" class="inline-block">{{ token }}&nbsp;</span>
-          </template>
-        </div>
-     </div>
-
-    <div class="rotate-[2deg] hover:scale-105 hover:-rotate-[3deg] transition-transform duration-300 inline-block">
-      <button
-        class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
-                  before:absolute before:bottom-[0px] before:left-0
-                  before:h-[100%] before:w-full
-                  before:bg-[#299F9C] before:[-z-index:1]
-                  before:scale-x-0 before:origin-left
-                  before:transition-transform before:duration-300
-                  hover:before:scale-x-100"
-        @click="stop"
-      >
-        <span class="relative z-10 cursor-pointer">⏹ Arrêter et analyser</span>
-      </button>
+      <div class="rotate-[2deg] hover:scale-105 hover:-rotate-[3deg] transition-transform duration-300 inline-block">
+        <button
+          class="mt-8 cursor-pointer text-lg font-bold bg-[#E86A64] py-2 px-3 relative inline-block font-medium
+                    before:absolute before:bottom-[0px] before:left-0
+                    before:h-[100%] before:w-full
+                    before:bg-[#299F9C] before:[-z-index:1]
+                    before:scale-x-0 before:origin-left
+                    before:transition-transform before:duration-300
+                    hover:before:scale-x-100"
+          @click="stop"
+        >
+          <span class="relative z-10 cursor-pointer">⏹ Arrêter et analyser</span>
+        </button>
+      </div>
+      <p class="mt-6 text-sm text-gray-600">⏱ {{ elapsed }}s — {{ gazePoints.length }} points enregistrés</p>
     </div>
-    <p class="mt-6 text-sm text-gray-600">⏱ {{ elapsed }}s — {{ gazePoints.length }} points enregistrés</p>
   </div>
 </template>
 

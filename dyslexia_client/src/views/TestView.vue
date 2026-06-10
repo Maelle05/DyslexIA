@@ -1,19 +1,19 @@
 <template>
+  <p class="absolute top-12 left-[180px] text-center text-black underline underline-offset-4">Step {{ stepIndex + 1 }} / {{ steps.length }} :</p>
   <div class="max-w-4xl mx-auto px-4 py-8 mt-15">
-    <p class="text-center text-gray-600">Step {{ stepIndex + 1 }} / {{ steps.length }}</p>
 
     <!-- Preview caméra toujours visible -->
     <div
     class="fixed z-50 transition-all duration-1000 bg-[#E9E4DB]"
     :class="step === 'camera'
-        ? 'bottom-4 right-4'
-        : 'bottom-4 right-4'"
+        ? 'top-[150px] right-1/2 translate-x-1/2'
+        : step === 'calibration' ? 'top-[calc(100vh-42vh)] right-4' : 'top-[calc(100vh-18vh)] right-4'"
     >
       <video ref="videoRef" autoplay playsinline muted
         class="rounded-lg border shadow-lg transition-all duration-1000 shadow-xl ring-2 ring-black/10"
         :class="(step === 'camera' || step === 'calibration')
-          ? 'h-[340px] w-[453px]'
-          : 'h-[120px] w-[160px]'"
+          ? 'h-[40vh] w-auto'
+          : 'h-[15vh] w-auto'"
         />
     </div>
 
@@ -39,7 +39,8 @@
       :a1-text="a1Text"
       :a2-text="a2Text"
       :a3-text="a3Text"
-      :a-text="parseInt(aText)" @next="next" @returnRead="returnRead"/>
+      :a-text="parseInt(aText)" @next="next" @returnRead="returnRead"
+    />
     <PredictionView v-if="step === 'prediction'" />
   </div>
 </template>
