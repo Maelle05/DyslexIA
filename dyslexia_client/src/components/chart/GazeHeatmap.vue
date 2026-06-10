@@ -110,7 +110,8 @@ function drawHeatmap(hits: WordHit[]) {
 
   for (const hit of hits) {
     if (hit.count === 0) continue
-    const intensity = hit.count / maxCount
+    // const intensity = hit.count / maxCount
+    const intensity = hit.count / 200
     const hue   = (1 - intensity) * 240
     const alpha = 0.15 + intensity * 0.7
 
