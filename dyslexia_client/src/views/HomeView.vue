@@ -82,14 +82,9 @@ const features = [
   },
   { title: 'IA Prédiction',
     color: '#6E9960',
-    desc: 'Modèle entraîné sur patterns oculaires cliniques',
-    text: `Notre modèle XGBoost a été entraîné sur deux sources issues de la recherche clinique en sciences cognitives et ophtalmologie.
-
-      ETDD70 — Eye-Tracking Dyslexia Dataset :
-      Un dataset de référence publié en 2024 sur Zenodo, constitué d'enregistrements de mouvements oculaires de participants dyslexiques et non-dyslexiques en situation de lecture. C'est la colonne vertébrale de notre modèle.
-
-      PLoS One — Screening for Dyslexia Using Eye Tracking (2016) :
-      Une étude clinique publiée dans une revue scientifique à comité de lecture, qui démontre la faisabilité du dépistage de la dyslexie par suivi oculaire. Elle a validé notre approche méthodologique.
+    desc: "Notre modèle analyse les mouvements oculaires enregistrés via webcam lors d'une session de lecture pour identifier des patterns caractéristiques de la dyslexie.",
+    text: `En quelques minutes seulement, sans matériel spécialisé, il extrait automatiquement des indicateurs clés : la coordination entre les deux yeux, l'inégalité des vitesses de lecture (gauche-droite et haut-bas) et la fréquence des changements de direction. Ces signaux sont combinés par un algorithme pour produire une prédiction fiable.
+      Entraîné sur les données de 255 participants, ses performances atteignent 78 % de détection des profils dyslexiques, avec une aire sous la courbe ROC de 0,87.
     `,
     img: '/imgs/humans-4.png'
   },
