@@ -106,7 +106,7 @@ function drawHeatmap(hits: WordHit[]) {
   const ctx = canvas.getContext('2d')!
   ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-  // const maxCount = Math.max(...hits.map(h => h.count), 1)
+  const maxCount = Math.max(...hits.map(h => h.count), 1)
 
   for (const hit of hits) {
     if (hit.count === 0) continue
