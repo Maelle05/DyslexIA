@@ -1,7 +1,36 @@
 """Build, save, load, and evaluate XGBoost models for dyslexia detection."""
 
 import xgboost as xgb
+import shap
 from sklearn.metrics import accuracy_score
+
+
+def _patch_shap_xgboost_base_score():
+    """Make SHAP's TreeExplainer compatible with XGBoost >= 3.
+    """
+    import shap.explainers._tree as _tree
+
+    if getattr(_tree.decode_ubjson_buffer, "_base_score_patched", False):
+        return
+
+    _orig_decode = _tree.decode_ubjson_buffer
+
+    def _decode(fp):
+        jmodel = _orig_decode(fp)
+        try:
+            lmp = jmodel["learner"]["learner_model_param"]
+            base_score = lmp.get("base_score")
+            if isinstance(base_score, str) and base_score.startswith("["):
+                lmp["base_score"] = base_score.strip("[]").split(",")[0]
+        except (KeyError, TypeError):
+            pass
+        return jmodel
+
+    _decode._base_score_patched = True
+    _tree.decode_ubjson_buffer = _decode
+
+
+_patch_shap_xgboost_base_score()
 
 
 class XGBoostModel:
@@ -122,3 +151,6 @@ class XGBoostModel:
         """
         self.model = xgb.XGBClassifier()
         self.model.load_model(file_path)
+
+    def explainer(self):
+        return shap.TreeExplainer(self.model)

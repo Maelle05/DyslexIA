@@ -22,6 +22,13 @@ QUESTIONS = [
 
 
 def get_passage():
+    """Select a random passage and return it with a multiple-choice question.
+
+    Returns:
+        A dictionary with the keys ``text`` (the passage string) and ``query``
+        (a mapping containing the question text, three answer options and the
+        index of the correct answer under the key ``valid``).
+    """
     idx = random.randint(0, len(PASSAGES) - 1)
 
     text = PASSAGES[idx]

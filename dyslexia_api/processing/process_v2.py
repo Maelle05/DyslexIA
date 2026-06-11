@@ -16,56 +16,67 @@ TARGET_LEN = 2000
 GAZE_COLS = ['x_left', 'y_left', 'x_right', 'y_right']
 
 
-def to_fixed_length(signal, target_len):
-    """Interpolate a signal to a fixed number of samples.
+def to_uniform(signal, timestamps):
+    """Resample a signal to a uniform timeline between 0 and 1.
+
+    Many gaze logs include irregular timestamps. This helper normalises the
+    input timestamps to the [0, 1] range and returns an interpolated signal
+    sampled at evenly spaced points matching the original signal length.
 
     Args:
-        signal: 1D numeric sequence representing a gaze trace.
-        target_len: Desired output length.
+        signal: 1D array-like of signal values.
+        timestamps: 1D array-like of monotonically increasing timestamps.
 
     Returns:
-        A numpy array of length ``target_len`` with linearly interpolated values.
+        A numpy array with the same length as ``signal`` containing the
+        resampled values.
     """
-    x_old = np.linspace(0, 1, len(signal))
-    x_new = np.linspace(0, 1, target_len)
-    return interp1d(x_old, signal, kind='linear')(x_new)
+    t_norm = (timestamps - timestamps[0]) / (timestamps[-1] - timestamps[0])
+    x_new  = np.linspace(0, 1, len(signal))
+    return np.interp(x_new, t_norm, signal)
 
+def extract_features(df):
+    """Extract a compact feature vector from binocular gaze traces.
 
-def extract_features(df, gaze_cols=GAZE_COLS, target_len=TARGET_LEN):
-    """Compute a feature vector from raw gaze coordinates.
+    The function computes a small set of summary statistics used as input
+    features for the dyslexia classifier: mean binocular divergence, the
+    ratio of 90th to 50th percentile velocities on X and Y, and the rate of
+    direction changes in the cyclopean X signal.
 
     Args:
-        df: DataFrame containing gaze log columns.
-        gaze_cols: List of gaze coordinate column names to process.
-        target_len: Number of samples used for fixed-length interpolation.
+        df: pandas DataFrame containing ``time`` and the gaze columns defined
+            in :data:`GAZE_COLS`.
 
     Returns:
-        A numpy array containing binocular divergence, vertical velocity
-        percentile, horizontal saccade rate, and high-frequency energy.
+        A 1D numpy array with four float features in the order described
+        above.
     """
+    timestamps = df['time'].values.astype(float)
     signals = {}
-    for col in gaze_cols:
-        signals[col] = to_fixed_length(df[col].values.astype(float), target_len)
+    for col in GAZE_COLS:
+        signals[col] = to_uniform(df[col].values.astype(float), timestamps)
 
-    # Divergence binoculaire moyenne — écart horizontal gauche/droite
-    mean_binocular_divergence = np.mean(np.abs(signals['x_left'] - signals['x_right']))
+    # Divergence binoculaire moyenne
+    mean_cross_divergence_x = np.mean(np.abs(signals['x_left'] - signals['x_right']))
 
-    # Percentile 90 de la vitesse verticale — y_left
-    vel_yl = np.abs(np.diff(signals['y_left']))
-    p90_vertical_velocity_left = np.percentile(vel_yl, 90)
+    # Cyclope
+    x = (signals['x_left'] + signals['x_right']) / 2
+    y = (signals['y_left'] + signals['y_right']) / 2
 
-    # Taux de saccades horizontales — x_left
-    vel_xl = np.abs(np.diff(signals['x_left']))
-    saccade_rate_x_left = np.sum(vel_xl > np.mean(vel_xl) + 2*np.std(vel_xl)) / len(vel_xl)
+    # Vélocités
+    vel_x = np.abs(np.diff(x))
+    x_vel_p90p50 = np.percentile(vel_x, 90) / (np.percentile(vel_x, 50) + 1e-8)
 
-    # Énergie normalisée de la bande la plus haute fréquence (bande 10/10) — x_left
-    spectrum = np.abs(fft(signals['x_left']))[:len(signals['x_left'])//2]
-    bands = np.array_split(spectrum, 10)
-    energies = np.array([np.sum(b**2) for b in bands])
-    high_freq_band_energy_x_left = (energies / (np.sum(energies) + 1e-8))[9]
+    vel_y = np.abs(np.diff(y))
+    y_vel_p90p50 = np.percentile(vel_y, 90) / (np.percentile(vel_y, 50) + 1e-8)
 
-    return np.array([mean_binocular_divergence, p90_vertical_velocity_left, saccade_rate_x_left, high_freq_band_energy_x_left])
+    # Taux de changements de direction
+    dx = np.diff(x)
+    x_direction_changes = np.sum(np.diff(np.sign(dx)) != 0) / len(dx)
 
+    return np.array([mean_cross_divergence_x,
+                     x_vel_p90p50, y_vel_p90p50,
+                     x_direction_changes])
 
 def process_data(X):
     """Normalise gaze data and extract inference features.
@@ -78,10 +89,17 @@ def process_data(X):
         A 1D numpy array of extracted features ready for model input.
     """
     X['time'] = X['time'] - X['time'][0]
-    X['x_left'] = (X['x_left'] - X['x_left'].min()) / (X['x_left'].max() - X['x_left'].min())
-    X['y_left'] = (X['y_left'] - X['y_left'].min()) / (X['y_left'].max() - X['y_left'].min())
-    X['x_right'] = (X['x_right'] - X['x_right'].min()) / (X['x_right'].max() - X['x_right'].min())
-    X['y_right'] = (X['y_right'] - X['y_right'].min()) / (X['y_right'].max() - X['y_right'].min())
+
+    # Normalize each gaze axis safely: if max == min, produce a zero array
+    for col in ['x_left', 'y_left', 'x_right', 'y_right']:
+        col_min = X[col].min()
+        col_max = X[col].max()
+        denom = col_max - col_min
+        if denom == 0:
+            X[col] = 0.0
+        else:
+            X[col] = (X[col] - col_min) / denom
+
     X_processed = extract_features(X)
 
     return X_processed

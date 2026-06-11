@@ -2,7 +2,7 @@ numpy
 pandas
 fastapi
 scikit-learn
-xgboost
+xgboost>=3,<4
 opencv-python
 mediapipe==0.10.21
 scipy
@@ -11,3 +11,4 @@ uvicorn
 python-multipart
 pytest
 httpx2
+shap>=0.49
