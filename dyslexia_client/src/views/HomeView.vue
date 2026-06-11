@@ -83,22 +83,31 @@ const features = [
   { title: 'IA Prédiction',
     color: '#6E9960',
     desc: 'Modèle entraîné sur patterns oculaires cliniques',
+    text: `Notre modèle XGBoost a été entraîné sur deux sources issues de la recherche clinique en sciences cognitives et ophtalmologie.
+
+      ETDD70 — Eye-Tracking Dyslexia Dataset :
+      Un dataset de référence publié en 2024 sur Zenodo, constitué d'enregistrements de mouvements oculaires de participants dyslexiques et non-dyslexiques en situation de lecture. C'est la colonne vertébrale de notre modèle.
+
+      PLoS One — Screening for Dyslexia Using Eye Tracking (2016) :
+      Une étude clinique publiée dans une revue scientifique à comité de lecture, qui démontre la faisabilité du dépistage de la dyslexie par suivi oculaire. Elle a validé notre approche méthodologique.
+    `,
     img: '/imgs/humans-4.png'
   },
-  { title: 'Rapport Détaillé',
+  { title: 'Rapport',
     color: '#299F9C',
-    desc: 'fixations, régressions, score global, prediction',
+    desc: 'Fixations, régressions, score global, prediction',
+    text: "C'est précisément ces mouvements oculaires atypiques : \n Les saccades, les fixations prolongées, les retours en arrière... qui constituent la signature mesurable de la dyslexie. \n C'est ce que DyslexIA capture.",
     img: '/imgs/humans-1.png'
   },
   {
     title: 'Disclaimer',
     color: '#E86A64',
-    text: "Cette application a été conçue à titre expérimental pour les utilisateurs francophones ; par conséquent, les résultats des prédictions, ainsi que la génération de texte et de questions, sont pour l'instant en français. \n L'eye-tracking donnera de meilleurs résultats avec des webcams de haute qualité et un bon éclairage. \n Cette application est une expérience et ne peut en aucun cas se substituer au diagnostic d'un professionnel. Si vous avez le moindre doute quant à une éventuelle dyslexie chez vous ou chez quelqu'un d'autre, nous vous recommandons de consulter un professionnel.",
+    text: "Cette application a été conçue à titre expérimental pour les utilisateurs francophones. Par conséquent, les résultats, prédictions, ainsi que la génération de texte et de questions, sont pour l'instant en français. \n\n L'eye-tracking offre de meilleurs résultats avec des webcams de haute qualité, un éclairage optimal et une stabilité maximale de la tête. \n Cette application est une expérience et ne peut en aucun cas se substituer au diagnostic d'un professionnel. Si vous avez le moindre doute quant à une éventuelle dyslexie chez vous ou chez quelqu'un d'autre, nous vous recommandons de consulter un professionnel.",
     img: '/imgs/humans-5.png'
   },
   { title: 'Crédits',
     color: '#6E9960',
-    desc: 'Justine Boulant \n Yoann Lemoine \n Maëlle Rabouan \n Manon Hell',
+    desc: '\n \n \n \n \n \n Justine Boulant \n Yoann Lemoine \n Maëlle Rabouan \n Manon Hell',
     text: 'Le Wagon Nantes #Batch-2275',
     img: '/imgs/humans-6.png'
   },

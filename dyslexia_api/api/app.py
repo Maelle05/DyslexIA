@@ -16,7 +16,8 @@ OPTIMAL_THRESHOLD = 0.5999999999999998
 app = FastAPI()
 
 origins = [
-    "https://dyslexia-eyes-detection.netlify.app"
+    "https://dyslexia-eyes-detection.netlify.app",
+    "http://localhost:5173"
 ]
 
 app.add_middleware(

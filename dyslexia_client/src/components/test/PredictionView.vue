@@ -18,7 +18,7 @@
       <p class="text-green-500 bg-white inline-block px-4 py-2 mt-2 shadow" >✅ Analyse terminée</p>
 
       <div class="text-3xl bg-white p-4 overflow-auto font-bold shadow">
-        <p>{{ result.Prediction === 0 ? 'Non dyslexique' : 'Dyslexique' }} à {{ Math.round(result.Probability * 100) }}%</p>
+        <p>{{ result.Prediction }} à {{ Math.round(result.Probability * 100) }}%</p>
       </div>
 
       <!-- <RouterLink to="/results"
@@ -122,6 +122,7 @@ async function send() {
     }
 
     result.value = await response.json()
+    console.log(result.value)
     status.value = 'done'
   } catch (e: any) {
     errorMsg.value = e.message ?? 'Erreur inconnue'
