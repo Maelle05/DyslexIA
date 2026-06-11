@@ -11,7 +11,7 @@ from dyslexia_api.processing.process_v2 import process_data
 from dyslexia_api.processing.text_question import get_passage
 from fastapi.middleware.cors import CORSMiddleware
 
-OPTIMAL_THRESHOLD = 0.35
+OPTIMAL_THRESHOLD = 0.5999999999999998
 
 app = FastAPI()
 
@@ -73,7 +73,7 @@ def predict(csv_file: Annotated[bytes, File()]):
         df = pd.DataFrame(array_data)
         X = process_data(df)
 
-        model = XGBoostModel.from_file("dyslexia_api/model/xgboost_dyslexia_model_v2.json")
+        model = XGBoostModel.from_file("dyslexia_api/model/xgboost_dyslexia_model_v3.json")
 
         prediction_proba = model.predict_proba(X.reshape(1, -1))
         prediction = int(prediction_proba[0][-1] >= OPTIMAL_THRESHOLD)
@@ -132,7 +132,7 @@ def explain_result(csv_file: Annotated[bytes, File()]):
         )
     X = process_data(pd.DataFrame(array_data))
 
-    model = XGBoostModel.from_file("dyslexia_api/model/xgboost_dyslexia_model_v2.json")
+    model = XGBoostModel.from_file("dyslexia_api/model/xgboost_dyslexia_model_v3.json")
 
     explainer = model.explainer()
     explanation = explainer(X.reshape(1, -1))
