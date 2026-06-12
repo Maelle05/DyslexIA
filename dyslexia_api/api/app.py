@@ -2,9 +2,14 @@
 from typing import Annotated
 from io import BytesIO
 import numpy as np
-from fastapi import FastAPI, File, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException
 import shap
 import pandas as pd
+from dyslexia_api.db.database import (
+    fetch_all_records,
+    fetch_records,
+    insert_record,
+)
 from dyslexia_api.model.xgboost import XGBoostModel
 from dyslexia_api.processing.text_generation import generate_passage
 from dyslexia_api.processing.process_v2 import process_data
@@ -12,12 +17,12 @@ from dyslexia_api.processing.text_question import get_passage
 from fastapi.middleware.cors import CORSMiddleware
 
 OPTIMAL_THRESHOLD = 0.5999999999999998
+MODEL_PATH = "dyslexia_api/model/xgboost_dyslexia_model_v3.json"
 
 app = FastAPI()
 
 origins = [
-    "https://dyslexia-eyes-detection.netlify.app",
-    "http://localhost:5173"
+    "https://dyslexia-eyes-detection.netlify.app"
 ]
 
 app.add_middleware(
@@ -50,18 +55,25 @@ def health_status():
 
 
 @app.post('/predict')
-def predict(csv_file: Annotated[bytes, File()]):
-    """Parse an uploaded CSV and return its contents as a JSON dictionary.
+def predict(
+    csv_file: Annotated[bytes, File()],
+    user_id: Annotated[str, Form()] = "anonymous",
+):
+    """Run the dyslexia model on an uploaded gaze log and store the result.
 
     The endpoint accepts raw gaze-log CSV bytes (produced by the app),
-    parses them with NumPy, converts to a DataFrame, and returns all columns as
-    a nested dict keyed by column name then row index.
+    parses them with NumPy, extracts the model features, and returns the
+    prediction. The raw gaze data and the prediction result are persisted
+    in the SQLite database so they can later be retrieved through the
+    ``/results/{user_id}`` endpoint.
 
     Args:
         csv_file: Raw bytes of a UTF-8 encoded CSV file with a header row.
+        user_id: Optional identifier of the user the gaze log belongs to.
+            Defaults to ``"anonymous"``.
 
     Returns:
-        JSON with a ``data`` key containing the DataFrame as a dict-of-dicts.
+        JSON with ``Prediction`` and ``Probability`` keys.
     """
     try:
         array_data = np.genfromtxt(
@@ -74,17 +86,76 @@ def predict(csv_file: Annotated[bytes, File()]):
         df = pd.DataFrame(array_data)
         X = process_data(df)
 
-        model = XGBoostModel.from_file("dyslexia_api/model/xgboost_dyslexia_model_v3.json")
+        model = XGBoostModel.from_file(MODEL_PATH)
 
         prediction_proba = model.predict_proba(X.reshape(1, -1))
         prediction = int(prediction_proba[0][-1] >= OPTIMAL_THRESHOLD)
+        label = "Dyslexique" if prediction == 1 else "Non-dyslexique"
+        probability = prediction_proba[0][-1].item()
+
+        insert_record(
+            user_id=user_id,
+            raw_gaze_data=csv_file.decode('utf-8'),
+            prediction=label,
+            probability=probability,
+        )
 
         return {
-            "Prediction": "Dyslexique" if prediction else "Non-dyslexique",
-            "Probability": prediction_proba[0][prediction].item()
+            "Prediction": label,
+            "Probability": probability
         }
+
     except Exception as exc:  # pragma: no cover - defensive
         raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.get('/results')
+def get_all_results():
+    """Return all stored gaze uploads and predictions, for every user.
+
+    Records are read from the SQLite database where the ``/predict``
+    endpoint stores every processed upload, ordered from the most recent
+    to the oldest.
+
+    Returns:
+        JSON with a ``results`` list, where each entry contains ``id``,
+        ``user_id``, ``raw_gaze_data``, ``prediction``, ``probability``
+        and ``created_at``. The list is empty when no record is stored.
+    """
+    return {
+        "results": fetch_all_records()
+    }
+
+
+@app.get('/results/{user_id}')
+def get_results(user_id: str):
+    """Return the stored gaze uploads and predictions for a user.
+
+    Records are read from the SQLite database where the ``/predict``
+    endpoint stores every processed upload, ordered from the most recent
+    to the oldest.
+
+    Args:
+        user_id: Identifier of the user whose results are requested.
+
+    Returns:
+        JSON with the ``user_id`` and a ``results`` list, where each entry
+        contains ``id``, ``user_id``, ``raw_gaze_data``, ``prediction``,
+        ``probability`` and ``created_at``.
+
+    Raises:
+        HTTPException: 404 when no record exists for the user.
+    """
+    records = fetch_records(user_id)
+    if not records:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No results found for user '{user_id}'",
+        )
+    return {
+        "user_id": user_id,
+        "results": records
+    }
 
 
 @app.get('/passage')
@@ -115,6 +186,7 @@ def get_text_question():
         "query": result['query']
     }
 
+
 @app.post('/explain')
 def explain_result(csv_file: Annotated[bytes, File()]):
     """Produce a model explanation for a single uploaded gaze log CSV.
@@ -133,7 +205,7 @@ def explain_result(csv_file: Annotated[bytes, File()]):
         )
     X = process_data(pd.DataFrame(array_data))
 
-    model = XGBoostModel.from_file("dyslexia_api/model/xgboost_dyslexia_model_v3.json")
+    model = XGBoostModel.from_file(MODEL_PATH)
 
     explainer = model.explainer()
     explanation = explainer(X.reshape(1, -1))
