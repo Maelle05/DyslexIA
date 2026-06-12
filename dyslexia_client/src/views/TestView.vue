@@ -5,8 +5,9 @@
     <!-- Preview caméra toujours visible -->
     <div
     class="fixed z-50 transition-all duration-1000 bg-[#E9E4DB]"
-    :class="step === 'camera'
-        ? 'top-[150px] right-1/2 translate-x-1/2'
+    :class="step === 'name'
+        ? 'opacity-0 top-[150px] right-1/2 translate-x-1/2' : step === 'camera'
+        ? 'opacity-100 top-[150px] right-1/2 translate-x-1/2'
         : step === 'calibration' ? 'top-[calc(100vh-42vh)] right-4' : 'top-[calc(100vh-18vh)] right-4'"
     >
       <video ref="videoRef" autoplay playsinline muted
@@ -17,6 +18,7 @@
         />
     </div>
 
+    <Name v-if="step === 'name'" @next="onName"/>
     <CameraDetect   v-if="step === 'camera'"  :video="videoRef" :mediapipe-ready="faceLandmarkerReady"  @next="onCameraReady" />
     <Calibration
       v-if="step === 'calibration'"
@@ -32,6 +34,7 @@
       :video="videoRef"
       :reading-text="readingText"
       :calib="calibData"
+      :id="store.id ?? ''"
       @stop="onStop"
     />
     <Question v-if="step === 'question'"
@@ -57,11 +60,12 @@ import Question    from '@/components/test/Question.vue'
 import Countdown      from '@/components/test/Countdown.vue'
 import ReadingSession from '@/components/test/ReadingSession.vue'
 import PredictionView from '@/components/test/PredictionView.vue'
+import Name from '@/components/test/Name.vue'
 
 const store = useSessionStore()
 
 // ── Steps ──────────────────────────────────────────────────────────────────
-const steps: TestStep[] = ['camera', 'calibration', 'warning-question', 'countdown', 'reading', 'question', 'prediction']
+const steps: TestStep[] = ['name', 'camera', 'calibration', 'warning-question', 'countdown', 'reading', 'question', 'prediction']
 const stepIndex = ref(0)
 const step = computed(() => steps[stepIndex.value])
 function next() { if (stepIndex.value < steps.length - 1) stepIndex.value++ }
@@ -152,6 +156,11 @@ onUnmounted(() => {
 
 // ── Décompte terminé ───────────────────────────────────────────────────────
 function onCountdownDone() {
+  next()
+}
+
+function onName(name:string) {
+  store.addId(name)
   next()
 }
 

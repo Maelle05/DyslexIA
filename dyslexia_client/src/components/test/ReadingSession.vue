@@ -50,6 +50,7 @@ const props = defineProps<{
   faceLandmarker: any
   readingText: string
   calib: CalibrationData | null
+  id: string
 }>()
 
 const emit = defineEmits<{ stop: [data: SessionData] }>()
@@ -130,6 +131,6 @@ function stop() {
   clearInterval(timerInterval)
   cancelAnimationFrame(animId)
   // console.log(gazePoints.value)
-  emit('stop', { gazePoints: gazePoints.value, readingText: formattedText(props.readingText) })
+  emit('stop', { gazePoints: gazePoints.value, readingText: formattedText(props.readingText), userId: props.id ?? '' })
 }
 </script>

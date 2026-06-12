@@ -22,7 +22,8 @@ MODEL_PATH = "dyslexia_api/model/xgboost_dyslexia_model_v3.json"
 app = FastAPI()
 
 origins = [
-    "https://dyslexia-eyes-detection.netlify.app"
+    "https://dyslexia-eyes-detection.netlify.app",
+    "http://localhost:5173"
 ]
 
 app.add_middleware(

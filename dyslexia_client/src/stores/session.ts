@@ -4,6 +4,7 @@ import type { SessionData } from '@/types/index'
 export const useSessionStore = defineStore('session', {
   state: () => ({
     data: null as SessionData | null,
+    id: null as string | null
   }),
   actions: {
     save(data: SessionData) {
@@ -11,6 +12,10 @@ export const useSessionStore = defineStore('session', {
     },
     clear() {
       this.data = null
+      this.id = null
     },
+    addId(name: string){
+      this.id = name
+    }
   },
 })

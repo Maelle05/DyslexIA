@@ -14,7 +14,8 @@ export interface GazePoint {
 
 export interface SessionData {
   gazePoints: GazePoint[],
-  readingText?: string 
+  readingText?: string ,
+  userId: string
 }
 
 export interface CalibrationData {
@@ -26,4 +27,4 @@ export interface CalibrationData {
   pitchOffset: number
 }
 
-export type TestStep = 'camera' | 'calibration' | 'warning-question' | 'question' | 'countdown' | 'reading' | 'prediction'
+export type TestStep = 'name' | 'camera' | 'calibration' | 'warning-question' | 'question' | 'countdown' | 'reading' | 'prediction'
