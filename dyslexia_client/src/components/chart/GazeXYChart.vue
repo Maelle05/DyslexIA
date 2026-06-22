@@ -32,6 +32,20 @@ const options = {
       display: true,
     },
   },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Temps (ms)',
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: 'Pitch (°)',
+      },
+    },
+  },
 }
 
 ChartJS.register(PointElement, LinearScale, Tooltip, Legend)
