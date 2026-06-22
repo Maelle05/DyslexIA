@@ -1,7 +1,7 @@
 <template>
   <div class="text-left bg-white p-5 shadow">
     <h3 class="font-semibold mb-4 text-center">Heatmap de lecture</h3>
-
+    <p class="text-center text-sm text-gray-400 mb-4">Score des mots détectés les plus fixés</p>
     <div
       ref="textContainer"
       class="relative text-lg leading-loose max-w-3xl mx-auto select-none"

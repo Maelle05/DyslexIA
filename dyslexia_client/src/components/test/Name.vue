@@ -8,7 +8,7 @@
           v-model="pseudo"
           type="text"
           placeholder="Votre pseudo…"
-          class="border-2 border-[#299F9C] px-4 py-2 text-lg w-full max-w-xs focus:outline-none focus:border-[#E86A64]"
+          class="border-2 border-[#299F9C] px-4 py-2 text-lg w-full max-w-xs focus:outline-none focus:border-[#E86A64] bg-[#E9E4DB] font-bold placeholder-gray-500"
         />
       </div>
       <div class="rotate-[2deg] hover:scale-105 hover:-rotate-[5deg] transition-transform duration-300 inline-block">

@@ -4,11 +4,11 @@
 
     <!-- Preview caméra toujours visible -->
     <div
-    class="fixed z-50 transition-all duration-1000 bg-[#E9E4DB]"
+    class="absolute z-50 transition-all duration-1000 bg-[#E9E4DB]"
     :class="step === 'name'
-        ? 'opacity-0 top-[150px] right-1/2 translate-x-1/2' : step === 'camera'
-        ? 'opacity-100 top-[150px] right-1/2 translate-x-1/2'
-        : step === 'calibration' ? 'top-[calc(100vh-42vh)] right-4' : 'top-[calc(100vh-18vh)] right-4'"
+        ? 'opacity-0 top-[120px] right-1/2 translate-x-1/2' : step === 'camera'
+        ? 'opacity-100 top-[100px] right-1/2 translate-x-1/2'
+        : step === 'calibration' ? 'top-[calc(100dvh-50dvh)] right-4' : 'top-[calc(100dvh-25dvh)] right-4'"
     >
       <video ref="videoRef" autoplay playsinline muted
         class="rounded-lg border shadow-lg transition-all duration-1000 shadow-xl ring-2 ring-black/10"

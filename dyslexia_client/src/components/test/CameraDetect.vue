@@ -2,7 +2,7 @@
   <div class="max-w-md mx-auto text-center px-4 pt-2 pb-8">
     <h2 class="text-3xl font-semibold mb-4 font-display" >Vérification de la caméra</h2>
 
-    <div class="mt-[45vh]">
+    <div class="mt-[45dvh]">
       <p v-if="!mediapipeReady" class="text-orange-500 bg-white inline-block px-4 py-2 mt-2" >⏳ Chargement du modèle IA…</p>
       <p v-if="error" class="text-red-500 text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">{{ error }}</p>
       <p v-if="ready && mediapipeReady && !error" class="text-[#6E9960] bg-white inline-block px-4 py-2 mt-2">Caméra détectée ✓</p>

@@ -24,9 +24,11 @@
         v-for="(f, i) in features"
         :key="f.title"
         class="feature-block py-20 px-[100px] flex flex-row justify-between align-bottom gap-10 border-b border-[#CDC7B9]"
-        :class="i % 2 === 0 ? 'mr-auto' : 'ml-auto text-right flex-row-reverse'"
+        :class="i % 2 === 0 ? 'mr-auto' : f.title == 'Crédits' ? 'text-right flex-row-reverse' : 'ml-auto flex-row-reverse'"
       >
-        <div class="max-w-[60vw]">
+        <div class="max-w-[60vw] flex flex-col justify-center"
+        :class="f.title == 'Crédits' ? 'items-end' : 'items-start'"
+        >
           <h3
             class="font-display text-black-900 text-3xl font-bold  py-3 px-6 inline-block mb-4"
             :style="{ backgroundColor: f.color }"
