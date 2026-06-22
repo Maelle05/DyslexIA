@@ -7,8 +7,6 @@ vectors.
 
 import numpy as np
 import pandas as pd
-from scipy.interpolate import interp1d
-from scipy.fft import fft
 
 pd.set_option('display.max_columns', None)
 
@@ -32,8 +30,9 @@ def to_uniform(signal, timestamps):
         resampled values.
     """
     t_norm = (timestamps - timestamps[0]) / (timestamps[-1] - timestamps[0])
-    x_new  = np.linspace(0, 1, len(signal))
+    x_new = np.linspace(0, 1, len(signal))
     return np.interp(x_new, t_norm, signal)
+
 
 def extract_features(df):
     """Extract a compact feature vector from binocular gaze traces.
@@ -77,6 +76,7 @@ def extract_features(df):
     return np.array([mean_cross_divergence_x,
                      x_vel_p90p50, y_vel_p90p50,
                      x_direction_changes])
+
 
 def process_data(X):
     """Normalise gaze data and extract inference features.
