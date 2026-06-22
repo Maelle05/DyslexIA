@@ -65,7 +65,7 @@ def predict(
     The endpoint accepts raw gaze-log CSV bytes (produced by the app),
     parses them with NumPy, extracts the model features, and returns the
     prediction. The raw gaze data and the prediction result are persisted
-    in the SQLite database so they can later be retrieved through the
+    in the BigQuery table so they can later be retrieved through the
     ``/results/{user_id}`` endpoint.
 
     Args:
@@ -114,7 +114,7 @@ def predict(
 def get_all_results():
     """Return all stored gaze uploads and predictions, for every user.
 
-    Records are read from the SQLite database where the ``/predict``
+    Records are read from the BigQuery table where the ``/predict``
     endpoint stores every processed upload, ordered from the most recent
     to the oldest.
 
@@ -132,7 +132,7 @@ def get_all_results():
 def get_results(user_id: str):
     """Return the stored gaze uploads and predictions for a user.
 
-    Records are read from the SQLite database where the ``/predict``
+    Records are read from the BigQuery table where the ``/predict``
     endpoint stores every processed upload, ordered from the most recent
     to the oldest.
 

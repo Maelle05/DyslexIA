@@ -1,1 +1,1 @@
-"""SQLite persistence layer for gaze data and prediction results."""
+"""BigQuery persistence layer for gaze data and prediction results."""
