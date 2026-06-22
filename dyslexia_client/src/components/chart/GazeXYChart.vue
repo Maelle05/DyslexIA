@@ -36,15 +36,15 @@ const options = {
     x: {
       title: {
         display: true,
-        text: 'Temps (ms)',
+        text: 'Yaw x (°)',
       },
     },
     y: {
       title: {
         display: true,
-        text: 'Pitch (°)',
+        text: 'Yaw y (°)',
       },
-    },
+    }
   },
 }
 

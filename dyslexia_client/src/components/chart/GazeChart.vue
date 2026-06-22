@@ -30,9 +30,23 @@ const options = {
       enabled: false,
     },
     legend: {
-      display: false,
+      display: true,
     },
   },
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: 'Temps (ms)',
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: 'Écart (°)',
+      },
+    }
+  }
 }
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend)
@@ -45,7 +59,7 @@ const data = computed(() => ({
   labels: chartData.value.map(p => p.t),
   datasets: [
     {
-      label: 'écart gauche',
+      label: 'Gauche',
       data: chartData.value.map(p => p.yaw_l),
       borderColor: '#6E9960',
       backgroundColor: '#6E9960',
@@ -53,7 +67,7 @@ const data = computed(() => ({
       pointRadius: 1.5,
     },
     {
-      label: 'écart droite',
+      label: 'Droit',
       data: chartData.value.map(p => p.yaw_r),
       borderColor: '#E86A64',
       backgroundColor: '#E86A64',
