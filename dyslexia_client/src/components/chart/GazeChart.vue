@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white p-4 shadow">
     <h3 class="font-semibold mb-4">Suivi du regard</h3>
-    <p class="text-center text-sm text-gray-400 mb-4">Évolution de l'écart du regard par rapport au centre</p>
+    <p class="text-center text-sm text-gray-400 mb-6">Évolution de l'écart du regard oeil droit / oeil gauche</p>
     <Line v-if="chartData.length" :data="data" :options="options"/>
   </div>
 </template>

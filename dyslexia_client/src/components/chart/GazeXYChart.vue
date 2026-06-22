@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white p-4 shadow">
     <h3 class="font-semibold mb-4">Relation X / Y (regard)</h3>
-    <p class="text-center text-sm text-gray-400 mb-4">Trajectoire de la position du regard sur l'écran</p>
+    <p class="text-center text-sm text-gray-400 mb-6">Trajectoire de la position du regard sur l'écran</p>
     <Scatter v-if="dataPoints.length" :data="chartData" :options="options"/>
     <p v-else class="text-gray-500">Aucune donnée disponible</p>
   </div>
@@ -29,7 +29,8 @@ const options = {
       enabled: false,
     },
     legend: {
-      display: false,
+      display: true,
+      position: 'top',
     },
   },
 }
